@@ -5,6 +5,7 @@
 //  Created by Qi Wu on 15.03.26.
 //
 
+import UIKit
 import XCTest
 
 final class VibePomodoroUITests: XCTestCase {
@@ -28,6 +29,25 @@ final class VibePomodoroUITests: XCTestCase {
 
         app.buttons["Pause"].tap()
         XCTAssertTrue(app.buttons["Resume"].waitForExistence(timeout: 2))
+    }
+
+    @MainActor
+    func testFocusStaysInPortraitWhenThePhoneTurns() throws {
+        try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .phone, "Only iPhone is limited to portrait.")
+        let app = makeCleanApp()
+        app.launch()
+        XCTAssertTrue(app.buttons["Start"].waitForExistence(timeout: 8), app.debugDescription)
+
+        addTeardownBlock {
+            await MainActor.run { XCUIDevice.shared.orientation = .portrait }
+        }
+        XCUIDevice.shared.orientation = .landscapeLeft
+        // Give the system time to rotate the interface if the app allowed it.
+        RunLoop.current.run(until: Date().addingTimeInterval(1.5))
+
+        let window = app.windows.firstMatch.frame
+        XCTAssertLessThan(window.width, window.height, app.debugDescription)
+        XCTAssertTrue(app.buttons["Start"].isHittable, app.debugDescription)
     }
 
     @MainActor

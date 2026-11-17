@@ -8,7 +8,7 @@ I make the product and design decisions and review the app hands-on. Much of the
 
 ## What I'm building
 
-The app has three pages, Focus, Productivity, and Settings, and requires iOS 26.2 or later. I have archived the native macOS and Live Activity experiments. They are outside the active product.
+The app has three pages, Focus, Productivity, and Settings, and requires iOS 26.2 or later. On iPhone it only runs in portrait. Focus is laid out around the vessel for a tall screen. In landscape the top of the vessel was cut off and the controls ended up under the tab bar. A landscape layout for a phone on a desk stand would need its own design, so I locked the orientation for now. I have archived the native macOS and Live Activity experiments. They are outside the active product.
 
 The app supports timestamp-based timing, background and relaunch recovery, focus and break cycles, early completion, an in-place completion summary, local history, interactive productivity charts, local notifications, event sounds, haptics, and appearance preferences. Send Feedback and Share App remain placeholders marked Soon.
 
