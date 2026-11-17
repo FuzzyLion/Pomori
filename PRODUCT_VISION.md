@@ -18,7 +18,7 @@ SwiftData, iCloud sync, advanced analytics, imported sounds, and more elaborate 
 
 ### The app today
 
-These are direct captures of the current build on iPhone 18 Pro / iOS 27.2, taken on 10 November 2026. The Focus session is a paused demonstration, and Productivity contains generated test history. Both appearances use the same fixture recipes. Productivity and Settings scroll beyond the captured viewport.
+These are direct captures of the current build on iPhone 18 Pro / iOS 27.2, taken on 18 November 2026. The Focus session is a paused demonstration, and Productivity contains generated test history. Both appearances use the same fixture recipes. Productivity and Settings scroll beyond the captured viewport.
 
 | Page | Light | Dark |
 | --- | :---: | :---: |

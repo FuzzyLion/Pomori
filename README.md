@@ -13,7 +13,7 @@ I decide what the app should do and how it should look, then check the result in
 | <img src="docs/screenshots/focus-light.png" alt="Light Focus page with a paused 12:30 countdown in an amber glass vessel" width="250"> | <img src="docs/screenshots/productivity-light.png" alt="Light Productivity page with all-time focus totals and a stacked Rhythm chart" width="250"> | <img src="docs/screenshots/settings-light.png" alt="Light Settings page with session rhythm and alert preferences" width="250"> |
 | <img src="docs/screenshots/focus-dark.png" alt="Dark Focus page with the same paused countdown" width="250"> | <img src="docs/screenshots/productivity-dark.png" alt="Dark Productivity page with the same generated history" width="250"> | <img src="docs/screenshots/settings-dark.png" alt="Dark Settings page with the same preferences" width="250"> |
 
-Captured on iPhone 18 Pro / iOS 27.2 on 10 November 2026. Focus is a paused demo session. Productivity uses generated test history, not my own records. The [full gallery](docs/screenshots/README.md) includes the other phases, chart selection, empty history, and the capture commands. Productivity and Settings continue below the screenshots.
+Captured on iPhone 18 Pro / iOS 27.2 on 18 November 2026. Focus is a paused demo session. Productivity uses generated test history, not my own records. The [full gallery](docs/screenshots/README.md) includes the other phases, chart selection, empty history, and the capture commands. Productivity and Settings continue below the screenshots.
 
 ## What I focused on
 
@@ -103,7 +103,7 @@ The running liquid surface has a 12 Hz refresh budget; digits update once per se
 
 ## Current limits
 
-The app runs locally, and each device owns its active timer. The earlier native macOS and Live Activity experiments are archived. Send Feedback and Share App still say Soon.
+The app runs locally, and each device owns its active timer. The earlier native macOS and Live Activity experiments are archived. Send Feedback and Share App still say Soon. On iPhone the app only runs in portrait, because I haven't designed a landscape layout for Focus.
 
 I haven't measured sustained rendering, heat, or energy use on the target physical iPhone 14 Pro. Physical haptics and lock-screen notification delivery also need device checks. The simulator screenshots don't establish those results, and long-history performance still needs measurement.
 
