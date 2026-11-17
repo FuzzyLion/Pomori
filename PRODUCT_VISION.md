@@ -231,7 +231,7 @@ Light mode uses warm white, mist gray, and pale gold. Both waves must remain vis
 
 Content cards use regular material. In light mode a white lift, one-pixel rim, and soft shadow make them read as panels. Dark mode keeps them deep warm gray so glass controls remain distinct. Their material should retain its hierarchy when system Liquid Glass tuning or iOS 27 Appearance settings change.
 
-SF Symbols are usually single-color. Accents mark phases, selected items, and meaningful states. External assets stay limited to the icon's vector source, restrained visual details, and bundled sounds. A photo library and imported sound collection are outside the MVP.
+SF Symbols are usually single-color. Accents mark phases, selected items, and meaningful states. The app tint colors the selected tab and alert buttons. In light mode the warm accent only reached about 2.8:1 on the tab bar, so light mode uses the amber ink, which reaches about 5:1. Dark mode keeps the warm accent, and Increase Contrast deepens both. Switches set their own warm amber and don't follow the tint. Alert buttons are still at about 3:1 when the amber vessel shows through their glass. External assets stay limited to the icon's vector source, restrained visual details, and bundled sounds. A photo library and imported sound collection are outside the MVP.
 
 The icon uses the same vessel outlines as Focus, sized by default phase duration. Amber Focus is largest and sits low on the left; jade Long Break floats higher on the right; mist Short Break is smallest and highest. I separated them because the nested version read as a target or an eye, while a composition around the upright Focus shape looked like an egg. Separate shapes rising at different heights read more clearly as bubbles.
 

@@ -14,6 +14,9 @@ enum VibePalette {
     static let amberGoldInk = Color(red: 0.50, green: 0.38, blue: 0.17)
     /// Amber for dark-mode text, light enough for 4.5:1 on the dark cards.
     static let amberGoldInkDark = Color(red: 0.90, green: 0.77, blue: 0.51)
+    /// The two inks under Increase Contrast.
+    static let amberGoldInkIncreased = Color(red: 0.40, green: 0.29, blue: 0.11)
+    static let amberGoldInkDarkIncreased = Color(red: 0.95, green: 0.86, blue: 0.66)
 
     static let warmBackground = Color(red: 0.96, green: 0.96, blue: 0.97)
     static let mistBackground = Color(red: 0.93, green: 0.93, blue: 0.95)
@@ -27,8 +30,21 @@ enum VibePalette {
     /// Amber text such as focus labels: an ink color for each appearance, stronger with Increase Contrast.
     static func amberText(for colorScheme: ColorScheme) -> ContrastAdaptiveColor {
         colorScheme == .dark
-            ? ContrastAdaptiveColor(amberGoldInkDark, increased: Color(red: 0.95, green: 0.86, blue: 0.66))
-            : ContrastAdaptiveColor(amberGoldInk, increased: Color(red: 0.40, green: 0.29, blue: 0.11))
+            ? ContrastAdaptiveColor(amberGoldInkDark, increased: amberGoldInkDarkIncreased)
+            : ContrastAdaptiveColor(amberGoldInk, increased: amberGoldInkIncreased)
+    }
+
+    /// The app tint, which colors the selected tab and the buttons of alerts. The warm accent read at
+    /// about 2.8:1 on the light tab bar, so light mode uses the amber ink (above 5:1 there); dark mode
+    /// keeps the accent, which already reads above 6:1. Controls that should stay warm amber, such as
+    /// the switches, set their own tint.
+    static func interfaceTint(for colorScheme: ColorScheme, contrast: ColorSchemeContrast) -> Color {
+        switch (colorScheme, contrast) {
+        case (.dark, .increased): amberGoldInkDark
+        case (.dark, _): warmAmberAccent
+        case (_, .increased): amberGoldInkIncreased
+        default: amberGoldInk
+        }
     }
 }
 
