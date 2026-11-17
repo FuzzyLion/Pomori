@@ -32,6 +32,50 @@ final class VibePomodoroUITests: XCTestCase {
     }
 
     @MainActor
+    func testFocusChromeFitsAtTheLargestTextSize() throws {
+        let app = makeCleanApp(
+            arguments: ["--appearance-light", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"],
+            environment: ["VIBE_FOCUS_FIXTURE": "focus-2-0.5"]
+        )
+        app.launch()
+
+        let resume = app.buttons["Resume"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 8), app.debugDescription)
+        let reset = app.buttons["Reset current step"]
+        let finish = app.buttons["Finish session early"]
+        let back = app.buttons["Back to last step"]
+        let skip = app.buttons["Skip current step"]
+        for control in [resume, reset, finish, back, skip] {
+            XCTAssertTrue(control.isHittable, "\(control.label) is not hittable\n\(app.debugDescription)")
+        }
+        XCTAssertFalse(resume.frame.intersects(back.frame) || resume.frame.intersects(skip.frame), app.debugDescription)
+
+        // The status title stays between the top controls.
+        let tabBar = app.tabBars.firstMatch.frame
+        let status = try XCTUnwrap(
+            app.staticTexts.matching(NSPredicate(format: "label == 'Focus'")).allElementsBoundByIndex
+                .first { !tabBar.intersects($0.frame) },
+            app.debugDescription
+        )
+        XCTAssertGreaterThan(status.frame.minX, reset.frame.maxX, app.debugDescription)
+        XCTAssertLessThan(status.frame.maxX, finish.frame.minX, app.debugDescription)
+        attachScreenshot(named: "focus-largest-text")
+
+        // A finished session's breakdown fits on the page above Done.
+        finish.tap()
+        app.alerts.buttons["Finish session early"].tap()
+        let done = app.buttons["Done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 4), app.debugDescription)
+        let caption = element(in: app, containing: "focus blocks")
+        XCTAssertTrue(caption.waitForExistence(timeout: 4), app.debugDescription)
+        let window = app.windows.firstMatch.frame
+        XCTAssertGreaterThanOrEqual(caption.frame.minX, window.minX, app.debugDescription)
+        XCTAssertLessThanOrEqual(caption.frame.maxX, window.maxX, app.debugDescription)
+        XCTAssertLessThanOrEqual(caption.frame.maxY, done.frame.minY, app.debugDescription)
+        attachScreenshot(named: "focus-largest-text-finished")
+    }
+
+    @MainActor
     func testFocusStaysInPortraitWhenThePhoneTurns() throws {
         try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .phone, "Only iPhone is limited to portrait.")
         let app = makeCleanApp()

@@ -15,6 +15,9 @@ struct FocusScreenLayout {
     static let bottomSecondaryButtonSize: CGFloat = 50
     static let bottomPrimaryButtonHeight: CGFloat = 52
     static let bottomPrimaryButtonMinWidth: CGFloat = 176
+    /// The chrome's text grows with Dynamic Type up to this size. Above it the layout around the vessel
+    /// would run out of room, so the controls offer the large content viewer instead.
+    static let largestTextSize: DynamicTypeSize = .accessibility1
     static let layoutSettlingEpsilon: CGFloat = 1
     static let immersiveLayoutRestoreFallbackDelay: Duration = .milliseconds(450)
     static let immersiveVisualFadeAnimation = Animation.easeOut(duration: 0.18)

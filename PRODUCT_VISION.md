@@ -123,6 +123,8 @@ A circular `.glass` button owns its visible circle; an outer slot owns hit area 
 
 Status reads Ready, Focus, Short Break, or Long Break. The primary control communicates running versus paused. The badge follows its content on one line and remains subordinate to the countdown.
 
+The status, its note, the primary label, and the summary line follow Dynamic Type. They grow up to the first accessibility size and stop there, because the chrome sits at fixed distances from the vessel and anything larger runs into it. The round controls keep their size. At accessibility sizes a long press on any Focus control, the primary button included, shows the large content viewer. At those sizes the glass button style also shrank their symbols to about three quarters, so the symbols set the medium image scale themselves. The countdown and FOCUSED are part of the vessel and keep their size.
+
 One compact marker represents each focus round. The current focus round is half filled. A past round fills only when its focus block reached the full duration; skipped and early-finished blocks remain outlined. Future markers stay subdued. The same completed-block meaning carries into Productivity.
 
 Tapping the background outside the vessel hides chrome, system status, and the tab bar; tapping again restores them. Keep the vessel's global position stable through safe-area changes. Immersion is unavailable during the completion summary and while VoiceOver is running. The shared shell coordinates tab-bar visibility.

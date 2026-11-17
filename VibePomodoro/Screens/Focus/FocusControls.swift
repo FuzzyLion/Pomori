@@ -42,7 +42,7 @@ struct FocusStatusTitle: View {
                 .shadow(color: phase.shadowColor.opacity(colorScheme == .dark ? 0.20 : 0.14), radius: 3)
 
             Text(text)
-                .font(.system(size: 18, weight: .semibold, design: .default))
+                .focusFont(.statusTitle)
                 .tracking(-0.2)
                 .lineLimit(1)
                 .minimumScaleFactor(0.84)
@@ -148,11 +148,19 @@ struct FocusIconButton: View {
             Image(systemName: systemImage)
                 .font(.system(size: symbolSize, weight: .medium))
                 .foregroundStyle(FocusControlColors.controlIconColor(for: colorScheme))
+                // At accessibility text sizes the glass style drew the symbol at about three quarters
+                // of its size inside the unchanged circle.
+                .imageScale(.medium)
                 .frame(width: diameter, height: diameter)
         }
         .buttonStyle(.glass(.regular.tint(Color.white.opacity(colorScheme == .dark ? 0.06 : 0.12))))
         .buttonBorderShape(.circle)
         .accessibilityLabel(accessibilityLabel)
+        // The circle keeps its size at every text size; at accessibility sizes a long press shows the
+        // symbol and its name enlarged.
+        .accessibilityShowsLargeContentViewer {
+            Label(accessibilityLabel, systemImage: systemImage)
+        }
         .zIndex(4)
     }
 }
@@ -170,11 +178,11 @@ struct FocusPrimaryControlButton: View {
                 // When the label changes inside an animation, as Pause becomes Done at a session's
                 // end, the symbol and the title change over together.
                 Image(systemName: action.systemImage)
-                    .font(.system(size: 15, weight: .semibold))
+                    .focusFont(.primarySymbol)
                     .contentTransition(.symbolEffect(.replace))
 
                 Text(action.title)
-                    .font(.system(size: 17, weight: .semibold, design: .default))
+                    .focusFont(.primaryLabel)
                     .tracking(-0.18)
                     .lineLimit(1)
                     .minimumScaleFactor(0.88)
@@ -192,6 +200,10 @@ struct FocusPrimaryControlButton: View {
         .tint(tint)
         .buttonBorderShape(.capsule)
         .accessibilityLabel(action.title)
+        // The label stops growing at the page's largest text size; beyond it a long press shows it enlarged.
+        .accessibilityShowsLargeContentViewer {
+            Label(action.title, systemImage: action.systemImage)
+        }
         .zIndex(4)
     }
 
