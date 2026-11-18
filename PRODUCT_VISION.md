@@ -166,11 +166,11 @@ With no archive, the summary and Rhythm show zeros and No finished sessions yet.
 
 Keep the system large title and an icon-only range `Menu` in the trailing toolbar. Its Week, Month, and Year entries are toggles so iOS supplies the selected checkmark, including at accessibility text sizes. Use system toolbar material.
 
-The first card is headed ALL TIME COMPLETED SESSIONS. I put Focus Time first because Session Time also increases with longer breaks. Daily Focus Avg and Streak sit below it. The footer keeps Session Time, finished-session count, and completed focus-block count available without giving them equal weight.
+The first card opens with FOCUS TIME on the left and ALL TIME on the right. I put Focus Time first because Session Time also increases with longer breaks. Daily Focus Avg and Streak sit below it. The footer keeps Session Time, finished-session count, and completed focus-block count available without giving them equal weight.
 
 A block is one focus round; a session is the whole cycle. Lifetime time stays in hours so it cannot be confused with the streak's days. From 100 hours onward, omit minutes.
 
-That summary always stays all-time. A quiet caption below it names the chart window and dates. Rhythm and Sessions follow, without title icons or range badges.
+That summary always stays all-time. The Rhythm card names its window and dates at its upper right, such as Last 7 days • 12–18 Nov. That used to be a caption between the two cards, under a separate ALL TIME COMPLETED SESSIONS heading, and together they pushed the chart's day labels under the tab bar on first view. Now the whole Rhythm card clears the tab bar on an iPhone 14 Pro. Rhythm and Sessions follow, without title icons or range badges.
 
 | Range | Window | Slots |
 | --- | --- | --- |
@@ -188,7 +188,7 @@ A dashed line marks average focus across slots with any focus, matching the acti
 
 Use a fixed-width value-axis column with round steps and at most four intervals. Up to one hour, show 0–60 minutes in 20-minute steps. Above that, use whole hours so axis labels do not need minute components.
 
-Tapping a slot places its date at the Rhythm card's upper right, replaces the top row with that slot's figures, and dims other bars. Keep numeric columns fixed. The current month names its elapsed dates, such as 1–10 Nov. The Sessions card then shows the latest five sessions that started in that slot, newest first, followed by a count such as 29 more when needed.
+Tapping a slot puts its date in place of the window at the Rhythm card's upper right, replaces the top row with that slot's figures, and dims other bars. The window fades out before the date fades in, because a plain cross-fade laid one date's letters over the other's. Keep numeric columns fixed. The current month names its elapsed dates, such as 1–10 Nov. The Sessions card then shows the latest five sessions that started in that slot, newest first, followed by a count such as 29 more when needed.
 
 Tap the selected slot again or tap the value-axis labels to return to the whole range. Changing the range clears the selection. Selection is tap-only, so starting a drag over the chart still scrolls the page.
 
@@ -198,7 +198,7 @@ Without a selection, Sessions lists the latest five starts in the range. Each ro
 
 All three cards use regular material, with more visual weight on the summary. I keep SF Pro and monospaced digits on this page. Didot works inside the Focus vessel, but repeating it across statistics adds a second voice and crowds the metric row. Amber marks focus, jade marks breaks, and other text stays neutral. Summary focus labels use amber ink, deeper in light mode and lighter in dark mode.
 
-Card text must reach at least 4.5:1 contrast in both appearances and strengthen with Increase Contrast. Typography follows system text styles. At accessibility sizes, summary metrics and Rhythm figures stack; a selected date takes its own line; session starts move above their markers and focus time. Axis text caps at xxLarge to preserve chart width; the selected date and figures above the chart provide the detail at larger sizes. The range button keeps the system bar-item size.
+Card text must reach at least 4.5:1 contrast in both appearances and strengthen with Increase Contrast. Typography follows system text styles. At accessibility sizes, summary metrics and Rhythm figures stack; the window or a selected date takes its own line; session starts move above their markers and focus time. Axis text caps at xxLarge to preserve chart width; the selected date and figures above the chart provide the detail at larger sizes. The range button keeps the system bar-item size.
 
 VoiceOver reads each slot's date, focus, breaks, and blocks, and each session's start, completed rounds, and focus time. Each slot's accessibility frame covers exactly its own column and activates that selection.
 

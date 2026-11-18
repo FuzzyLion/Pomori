@@ -10,13 +10,12 @@ struct ProductivitySummaryStrip: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: ProductivityLayout.SummaryCard.stackSpacing) {
-            header
-
             ProductivityPrimarySummaryMetric(
                 title: "Focus Time",
                 value: ProductivityValueFormatting.lifetimeDurationText(snapshot.totalFocusTime),
                 accessibilityValue: ProductivityValueFormatting.lifetimeDurationAccessibilityValue(snapshot.totalFocusTime),
                 titleColor: focusTitleColor,
+                scopeColor: headerTextColor,
                 valueColor: primaryValueColor,
                 dynamicTypeSize: dynamicTypeSize
             )
@@ -50,16 +49,6 @@ struct ProductivitySummaryStrip: View {
         ) {
             summaryAccentOverlay
         }
-    }
-
-    private var header: some View {
-        Text("ALL TIME COMPLETED SESSIONS")
-            .productivityFont(.sectionLabel)
-            .foregroundStyle(headerTextColor)
-            .tracking(ProductivityLayout.SummaryCard.titleTracking)
-            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
-            .minimumScaleFactor(0.92)
-            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var summaryDivider: some View {
@@ -129,16 +118,27 @@ private struct ProductivityPrimarySummaryMetric: View {
     let value: String
     let accessibilityValue: String
     let titleColor: ContrastAdaptiveColor
+    /// The summary covers all finished sessions, whatever range the charts below show.
+    let scopeColor: ContrastAdaptiveColor
     let valueColor: ContrastAdaptiveColor
     let dynamicTypeSize: DynamicTypeSize
 
     var body: some View {
         VStack(alignment: .leading, spacing: ProductivityLayout.PrimaryMetric.spacing) {
-            Text(title)
-                .productivityFont(.sectionLabel)
-                .foregroundStyle(titleColor)
-                .textCase(.uppercase)
-                .tracking(ProductivityLayout.PrimaryMetric.titleTracking)
+            // One heading row: what the figure is on the left and its scope on the right. This used
+            // to be two rows, and the second one helped push the chart under the tab bar.
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: ProductivityLayout.PrimaryMetric.scopeSpacing) {
+                    titleText
+                    Spacer(minLength: 0)
+                    scopeText
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    titleText
+                    scopeText
+                }
+            }
 
             Text(value)
                 .productivityFont(.primaryFigure)
@@ -153,8 +153,26 @@ private struct ProductivityPrimarySummaryMetric: View {
                 .monospacedDigit()
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(title)
+        .accessibilityLabel("\(title), all time")
         .accessibilityValue(accessibilityValue)
+    }
+
+    private var titleText: some View {
+        Text(title)
+            .productivityFont(.sectionLabel)
+            .foregroundStyle(titleColor)
+            .textCase(.uppercase)
+            .tracking(ProductivityLayout.PrimaryMetric.titleTracking)
+            .fixedSize()
+    }
+
+    private var scopeText: some View {
+        Text("All Time")
+            .productivityFont(.sectionLabel)
+            .foregroundStyle(scopeColor)
+            .textCase(.uppercase)
+            .tracking(ProductivityLayout.SummaryCard.titleTracking)
+            .fixedSize()
     }
 }
 

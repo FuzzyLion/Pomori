@@ -183,9 +183,15 @@ final class VibePomodoroUITests: XCTestCase {
         func uncoveredBar() -> XCUIElement? {
             todaysBars.allElementsBoundByIndex.first { $0.frame.minY > visibleTop && $0.frame.maxY < visibleBottom }
         }
+        // Short drags held before release, towards the bar: a full swipe could fling the column from
+        // under the tab bar to above the navigation bar in one go.
         var candidate = uncoveredBar()
-        for _ in 0..<3 where candidate == nil {
-            app.swipeUp()
+        for _ in 0..<8 where candidate == nil {
+            guard let bar = todaysBars.allElementsBoundByIndex.first else { break }
+            let barIsAbove = bar.frame.minY <= visibleTop
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: barIsAbove ? 0.35 : 0.65))
+            let end = start.withOffset(CGVector(dx: 0, dy: (barIsAbove ? 1 : -1) * app.frame.height * 0.25))
+            start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.3)
             candidate = uncoveredBar()
         }
         let todaysBar = try XCTUnwrap(candidate, app.debugDescription)
