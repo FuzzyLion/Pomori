@@ -756,6 +756,35 @@ struct VibePomodoroTests {
         #expect(!reduceMotionPolicy.animatesSurface)
     }
 
+    @Test func liquidSurfaceLightIsForDarkFocusOnly() async throws {
+        let focus = BubblePhaseMorph(sourcePhase: .focus, targetPhase: .focus, progress: 1)
+        let shortBreak = BubblePhaseMorph(sourcePhase: .shortBreak, targetPhase: .shortBreak, progress: 1)
+        let longBreak = BubblePhaseMorph(sourcePhase: .longBreak, targetPhase: .longBreak, progress: 1)
+        let halfwayToBreak = BubblePhaseMorph(sourcePhase: .focus, targetPhase: .shortBreak, progress: 0.5)
+
+        #expect(BubbleLiquidShader.surfaceLift(for: focus, isDark: true) == 0.2)
+        #expect(BubbleLiquidShader.surfaceLift(for: shortBreak, isDark: true) == 0)
+        #expect(BubbleLiquidShader.surfaceLift(for: longBreak, isDark: true) == 0)
+        #expect(BubbleLiquidShader.surfaceLift(for: focus, isDark: false) == 0)
+        // It fades with the phase change instead of switching off at some point in it.
+        #expect(abs(BubbleLiquidShader.surfaceLift(for: halfwayToBreak, isDark: true) - 0.1) < 0.0001)
+    }
+
+    @Test func darkFocusButtonUsesTheRicherAmberAndBreaksKeepTheirWash() async throws {
+        let environment = EnvironmentValues()
+        func tint(_ action: FocusPrimaryAction, _ phase: SessionPhase, _ scheme: ColorScheme) -> Color.Resolved {
+            FocusControlColors.primaryButtonTint(for: action, phase: phase, colorScheme: scheme).resolve(in: environment)
+        }
+        let richAmber = VibePalette.amberGoldRich.opacity(0.40).resolve(in: environment)
+
+        #expect(tint(.resume, .focus, .dark) == richAmber)
+        #expect(tint(.done, .focus, .dark) == richAmber)
+        #expect(tint(.resume, .focus, .light) == VibePalette.amberGold.opacity(0.42).resolve(in: environment))
+        #expect(tint(.start, .shortBreak, .dark) == VibePalette.softMist.opacity(0.34).resolve(in: environment))
+        #expect(tint(.done, .longBreak, .dark) == VibePalette.softJade.opacity(0.34).resolve(in: environment))
+        #expect(tint(.pause, .focus, .dark) == Color.white.opacity(0.10).resolve(in: environment))
+    }
+
     @Test func finishedSessionSummaryCountsBlocksBreaksAndFocusShare() async throws {
         var settings = PomodoroSettings.default
         settings.focusMinutes = 25

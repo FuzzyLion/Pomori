@@ -121,6 +121,15 @@ enum BubbleLiquidShader {
     private static let darkBackdrop = Color(red: 0.150, green: 0.155, blue: 0.168)
     private static let lightBackdrop = Color(red: 0.964, green: 0.968, blue: 0.976)
 
+    /// Light just below the surface, for the Focus liquid in dark mode. Amber that dark read as tea
+    /// rather than amber. The break colors don't turn brown when dark, and their submerged numerals
+    /// would lose contrast they don't have to spare, so they go without. It follows the morph like
+    /// the colors do.
+    static func surfaceLift(for phaseMorph: BubblePhaseMorph, isDark: Bool) -> Double {
+        guard isDark else { return 0 }
+        return phaseMorph.blendedValue { $0 == .focus ? 0.2 : 0 }
+    }
+
     static func shader(
         phaseMorph: BubblePhaseMorph,
         frame: BubbleLiquidFrame,
@@ -179,7 +188,8 @@ enum BubbleLiquidShader {
                 Float(sections.bounds.minX),
                 Float(sections.bounds.maxX)
             ),
-            .floatArray(sections.values)
+            .floatArray(sections.values),
+            .float(Float(surfaceLift(for: phaseMorph, isDark: isDark)))
         )
     }
 }

@@ -26,6 +26,20 @@ enum FocusControlColors {
     static var lightProminentButtonForeground: Color {
         VibePalette.labelPrimary.opacity(0.92)
     }
+
+    /// Pause stays neutral so the bubble remains the strongest color while a step runs. Start,
+    /// Resume, and Done carry a light wash of the current phase color. In dark mode Amber Gold at
+    /// that opacity mixed with the glass to khaki, so Focus takes the richer amber, which is about
+    /// as light and keeps the white label near 5.5:1.
+    static func primaryButtonTint(for action: FocusPrimaryAction, phase: SessionPhase, colorScheme: ColorScheme) -> Color {
+        if action == .pause {
+            return Color.white.opacity(colorScheme == .dark ? 0.10 : 0.70)
+        }
+        if colorScheme == .dark, phase == .focus {
+            return VibePalette.amberGoldRich.opacity(0.40)
+        }
+        return phase.tintColor.opacity(colorScheme == .dark ? 0.34 : 0.42)
+    }
 }
 
 struct FocusStatusTitle: View {
@@ -275,7 +289,7 @@ struct FocusPrimaryControlButton: View {
             )
         }
         .buttonStyle(.glassProminent)
-        .tint(tint)
+        .tint(FocusControlColors.primaryButtonTint(for: action, phase: phase, colorScheme: colorScheme))
         .buttonBorderShape(.capsule)
         .accessibilityLabel(action.title)
         // The label stops growing at the page's largest text size; beyond it a long press shows it enlarged.
@@ -283,15 +297,5 @@ struct FocusPrimaryControlButton: View {
             Label(action.title, systemImage: action.systemImage)
         }
         .zIndex(4)
-    }
-
-    /// Pause stays neutral so the bubble remains the strongest color while a step runs.
-    /// Start, Resume, and Done carry a light wash of the current phase color.
-    private var tint: Color {
-        if action == .pause {
-            return Color.white.opacity(colorScheme == .dark ? 0.10 : 0.70)
-        }
-
-        return phase.tintColor.opacity(colorScheme == .dark ? 0.34 : 0.42)
     }
 }

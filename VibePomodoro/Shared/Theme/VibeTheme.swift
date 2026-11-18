@@ -3,6 +3,10 @@ import SwiftUI
 enum VibePalette {
     static let amberGold = Color(red: 0.85, green: 0.70, blue: 0.40)
     static let amberGoldDeep = Color(red: 0.76, green: 0.58, blue: 0.25)
+    /// Amber Gold after light has crossed some of the liquid: each channel squared, scaled back to the
+    /// brightest. The dark Focus liquid lights its top with it, and the dark Focus button uses it
+    /// because Amber Gold at that opacity mixed with the glass to khaki.
+    static let amberGoldRich = Color(red: 0.85, green: 0.576, blue: 0.188)
     static let warmAmberAccent = Color(red: 0.70, green: 0.55, blue: 0.31)
     static let warmAmberAccentDeep = Color(red: 0.58, green: 0.44, blue: 0.24)
     static let softMist = Color(red: 0.71, green: 0.82, blue: 0.90)
