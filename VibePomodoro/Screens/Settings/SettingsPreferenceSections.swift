@@ -103,7 +103,9 @@ struct SettingsDisplaySection: View {
                     SettingsToggleRow(
                         isOn: keepScreenOnBinding,
                         title: "Keep Screen On",
-                        subtitle: "Active sessions only"
+                        // A paused session is still active, but only a running one keeps the
+                        // screen on.
+                        subtitle: "Only while the timer is running"
                     )
                 }
             }

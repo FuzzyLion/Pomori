@@ -262,6 +262,7 @@ final class VibePomodoroUITests: XCTestCase {
         let appearanceMenu = app.buttons["settings.appearance"]
         XCTAssertTrue(appearanceMenu.waitForExistence(timeout: 2), app.debugDescription)
         XCTAssertTrue(app.switches["Keep Screen On"].exists || app.buttons["Keep Screen On"].exists)
+        XCTAssertTrue(element(in: app, containing: "Only while the timer is running").exists, app.debugDescription)
         XCTAssertTrue(app.staticTexts["Follow System"].exists)
 
         scrollUntilHittable(appearanceMenu, in: app)
