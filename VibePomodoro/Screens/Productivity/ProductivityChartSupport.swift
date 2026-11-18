@@ -252,6 +252,7 @@ enum ProductivityChartFormatting {
     }()
     private static let dayFormatter = englishFormatter("d")
     private static let monthYearFormatter = englishFormatter("MMM yyyy")
+    private static let monthFormatter = englishFormatter("MMM")
     private static let selectedDayFormatter = englishFormatter("EEE d MMM")
     private static let spokenDayFormatter = englishFormatter("EEEE d MMMM")
     private static let spokenMonthFormatter = englishFormatter("MMMM yyyy")
@@ -264,10 +265,12 @@ enum ProductivityChartFormatting {
     }
 
     /// The span the trend cards cover, such as "3–9 Nov", "11 Oct – 9 Nov", or "Dec 2025 – Nov 2026".
+    /// With `includesYears` off, a rolling year reads Dec – Nov; days already leave the year out.
     static func rangeDatesText(
         for buckets: [ProductivityDisplayBucket],
         range: ProductivityRange,
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = .autoupdatingCurrent,
+        includesYears: Bool = true
     ) -> String {
         guard let first = buckets.first?.startDate, let last = buckets.last?.startDate else { return "" }
 
@@ -275,8 +278,30 @@ enum ProductivityChartFormatting {
         case .week, .month:
             return dayRangeText(from: first, to: last, calendar: calendar)
         case .year:
-            return "\(monthYearFormatter.string(from: first)) – \(monthYearFormatter.string(from: last))"
+            let formatter = includesYears ? monthYearFormatter : monthFormatter
+            return "\(formatter.string(from: first)) – \(formatter.string(from: last))"
         }
+    }
+
+    /// The Rhythm card's window line, longest first. The card shows the first one that fits beside its
+    /// title, so the line never wraps or ends in an ellipsis. What gives way first is what the rest
+    /// already says: the years of a rolling year, then the window's name, which the dates imply.
+    static func rangeCaptionLines(
+        for buckets: [ProductivityDisplayBucket],
+        range: ProductivityRange,
+        calendar: Calendar = .autoupdatingCurrent
+    ) -> [String] {
+        let dates = rangeDatesText(for: buckets, range: range, calendar: calendar)
+        let shortDates = rangeDatesText(for: buckets, range: range, calendar: calendar, includesYears: false)
+        guard !dates.isEmpty else { return [range.windowTitle] }
+
+        let lines = [
+            "\(range.windowTitle) • \(dates)",
+            "\(range.windowTitle) • \(shortDates)",
+            dates,
+            shortDates
+        ]
+        return lines.enumerated().filter { index, line in !lines[..<index].contains(line) }.map(\.element)
     }
 
     /// The day or month a tapped bar stands for. The month in progress names the days it covers so far.

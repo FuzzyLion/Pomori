@@ -1319,6 +1319,18 @@ struct VibePomodoroTests {
         #expect(ProductivityChartFormatting.rangeDatesText(for: month, range: .month, calendar: calendar) == "11 Oct – 9 Nov")
         #expect(ProductivityChartFormatting.rangeDatesText(for: year, range: .year, calendar: calendar) == "Dec 2025 – Nov 2026")
         #expect(ProductivityChartFormatting.rangeDatesText(for: [], range: .week, calendar: calendar) == "")
+
+        // When the whole line doesn't fit beside the title, the years of a rolling year go first.
+        #expect(ProductivityChartFormatting.rangeCaptionLines(for: year, range: .year, calendar: calendar) == [
+            "Last 12 months • Dec 2025 – Nov 2026",
+            "Last 12 months • Dec – Nov",
+            "Dec 2025 – Nov 2026",
+            "Dec – Nov"
+        ])
+        #expect(ProductivityChartFormatting.rangeCaptionLines(for: week, range: .week, calendar: calendar) == [
+            "Last 7 days • 3–9 Nov",
+            "3–9 Nov"
+        ])
     }
 
     @Test func productivitySelectionNamesTheTappedDayOrMonth() async throws {

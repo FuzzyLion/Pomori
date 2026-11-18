@@ -170,7 +170,7 @@ The first card opens with FOCUS TIME on the left and ALL TIME on the right. I pu
 
 A block is one focus round; a session is the whole cycle. Lifetime time stays in hours so it cannot be confused with the streak's days. From 100 hours onward, omit minutes.
 
-That summary always stays all-time. The Rhythm card names its window and dates at its upper right, such as Last 7 days • 12–18 Nov. That used to be a caption between the two cards, under a separate ALL TIME COMPLETED SESSIONS heading, and together they pushed the chart's day labels under the tab bar on first view. Now the whole Rhythm card clears the tab bar on an iPhone 14 Pro. Rhythm and Sessions follow, without title icons or range badges.
+That summary always stays all-time. The Rhythm card names its window and dates at its upper right, such as Last 7 days • 12–18 Nov. The line never wraps and never ends in an ellipsis, since a second line looked messy and an ellipsis hid the end of the dates. When it doesn't fit beside the title, it drops what the rest already says: first the years of a rolling year, as in Last 12 months • Dec – Nov, then the window's name, as in 20 Oct – 18 Nov. VoiceOver always reads the whole window. That used to be a caption between the two cards, under a separate ALL TIME COMPLETED SESSIONS heading, and together they pushed the chart's day labels under the tab bar on first view. Now the whole Rhythm card clears the tab bar on an iPhone 14 Pro. Rhythm and Sessions follow, without title icons or range badges.
 
 | Range | Window | Slots |
 | --- | --- | --- |

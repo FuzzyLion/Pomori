@@ -81,6 +81,7 @@ struct ProductivityRhythmCard: View {
     /// rather than sliding, since their widths differ.
     private func headerDetail(selectionText: String?, alignment: Alignment) -> some View {
         let dates = ProductivityChartFormatting.rangeDatesText(for: buckets, range: range)
+        let lines = ProductivityChartFormatting.rangeCaptionLines(for: buckets, range: range)
 
         return ZStack(alignment: alignment) {
             if let selectionText {
@@ -88,10 +89,15 @@ struct ProductivityRhythmCard: View {
                     .id("slot \(selectionText)")
                     .transition(Self.detailTransition)
             } else {
-                detailLabel("\(range.windowTitle) • \(dates)")
-                    .accessibilityLabel("\(range.windowTitle), \(dates)")
-                    .id("range \(range.windowTitle) \(dates)")
-                    .transition(Self.detailTransition)
+                // The longest line that fits; VoiceOver always hears the whole window.
+                ViewThatFits(in: .horizontal) {
+                    ForEach(lines, id: \.self) { line in
+                        detailLabel(line)
+                            .accessibilityLabel("\(range.windowTitle), \(dates)")
+                    }
+                }
+                .id("range \(range.windowTitle) \(dates)")
+                .transition(Self.detailTransition)
             }
         }
     }
