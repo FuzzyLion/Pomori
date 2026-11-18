@@ -8,7 +8,7 @@ The session and history data is generated for these previews. The [README](../..
 
 | Detail | Value |
 | --- | --- |
-| App source revision | `4cc58ee55c1b` |
+| App source revision | `3b7603b14c92` |
 | Build | Debug, `VibePomodoro` iOS scheme |
 | Toolchain | Xcode 27.2, build 27B52 |
 | Device | iPhone 18 Pro |
