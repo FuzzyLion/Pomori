@@ -1,7 +1,13 @@
 import Foundation
+import SwiftUI
 import UserNotifications
 
 struct PomodoroNotificationPlan: Equatable {
+    /// A timer reminder matters the moment it arrives, so it may break through a Focus and the
+    /// scheduled summary. That takes the Time Sensitive Notifications capability, which only a paid
+    /// developer team can sign. Without it iOS delivers the reminders as ordinary notifications.
+    static let interruptionLevel: UNNotificationInterruptionLevel = .timeSensitive
+
     let identifier: String
     let title: String
     let body: String
@@ -10,6 +16,19 @@ struct PomodoroNotificationPlan: Equatable {
 
     var soundName: String? {
         soundResource?.notificationSoundName
+    }
+
+    var request: UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.interruptionLevel = Self.interruptionLevel
+        if let soundName {
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
+        }
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
+        return UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
     }
 }
 
@@ -73,7 +92,8 @@ extension PomodoroStore {
         }
 
         Task {
-            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])
+            // The app shows no badge, so it doesn't ask for one.
+            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
             await updateNotificationPermission()
             // Reminders for a session that started before the answer.
             syncNotifications()
@@ -103,29 +123,27 @@ extension PomodoroStore {
         }
     }
 
+    /// Replaces every pending reminder with the ones the session needs now.
     func syncNotifications() {
-        let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: pendingNotificationIdentifiers())
+        notificationScheduler.replacePendingRequests(with: notificationPlans(now: .now).map(\.request))
+    }
 
-        let plans = notificationPlans(now: .now)
+    /// Once the app is open it shows where the timer stands, so reminders already delivered are out
+    /// of date.
+    func clearDeliveredNotifications() {
+        notificationScheduler.removeDeliveredNotifications()
+    }
 
-        for plan in plans {
-            let content = UNMutableNotificationContent()
-            content.title = plan.title
-            content.body = plan.body
-            if let soundName = plan.soundName {
-                content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
-            }
+    /// While the app is open and active, its own sound and haptic mark a boundary, so a reminder that
+    /// arrives then stays hidden. Behind Control Center or the app switcher the app gives no response
+    /// of its own, so the reminder shows as it would in the background.
+    var notificationPresentationOptions: UNNotificationPresentationOptions {
+        currentScenePhase == .active ? [] : [.banner, .list, .sound]
+    }
 
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: plan.timeInterval, repeats: false)
-            let request = UNNotificationRequest(
-                identifier: plan.identifier,
-                content: content,
-                trigger: trigger
-            )
-
-            center.add(request, withCompletionHandler: nil)
-        }
+    /// Every reminder is about the timer, so opening one shows Focus.
+    func showFocusForOpenedNotification() {
+        selectedTab = .focus
     }
 
     func notificationPlans(now: Date = .now) -> [PomodoroNotificationPlan] {
@@ -176,11 +194,6 @@ extension PomodoroStore {
 }
 
 private extension PomodoroStore {
-    func pendingNotificationIdentifiers() -> [String] {
-        guard let session = activeSession else { return [] }
-        return (0..<session.steps.count).map { notificationIdentifier(for: session.id, stepIndex: $0) }
-    }
-
     func notificationIdentifier(for sessionID: UUID, stepIndex: Int) -> String {
         "vibe.\(sessionID.uuidString).\(stepIndex)"
     }

@@ -10,6 +10,7 @@ extension PomodoroStore {
         case .active:
             reconcileNow(deliverForegroundFeedback: false)
             syncIdleTimer()
+            clearDeliveredNotifications()
             syncNotifications()
             refreshNotificationPermission()
         case .inactive, .background:

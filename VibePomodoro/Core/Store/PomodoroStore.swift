@@ -27,6 +27,7 @@ final class PomodoroStore: ObservableObject {
 
     let defaults: UserDefaults
     let feedbackPlayer: ReminderFeedbackPlaying
+    let notificationScheduler: ReminderNotificationScheduling
     let encoder = JSONEncoder()
     var stepBoundaryTimer: Timer?
     var currentScenePhase: ScenePhase = .active
@@ -38,9 +39,14 @@ final class PomodoroStore: ObservableObject {
         static let productivityCache = "vibe.productivityCache"
     }
 
-    init(defaults: UserDefaults = .standard, feedbackPlayer: ReminderFeedbackPlaying? = nil) {
+    init(
+        defaults: UserDefaults = .standard,
+        feedbackPlayer: ReminderFeedbackPlaying? = nil,
+        notificationScheduler: ReminderNotificationScheduling? = nil
+    ) {
         self.defaults = defaults
         self.feedbackPlayer = feedbackPlayer ?? ReminderFeedbackPlayer()
+        self.notificationScheduler = notificationScheduler ?? ReminderNotificationScheduler()
         Self.resetStorageIfRequested(using: defaults)
         Self.seedUITestingProductivityFixtureIfRequested(using: defaults)
         Self.seedUITestingFocusFixtureIfRequested(using: defaults)
@@ -51,11 +57,13 @@ final class PomodoroStore: ObservableObject {
         self.completedSessions = Self.loadValue(for: StorageKey.completedSessions, using: defaults) ?? []
         self.productivityCache = Self.loadValue(for: StorageKey.productivityCache, using: defaults) ?? .empty
         self.selectedTab = Self.initialSelectedTab()
+        self.notificationScheduler.attach(to: self)
 
         reconcileNow(deliverForegroundFeedback: false)
         repairProductivityCacheIfNeeded()
         syncIdleTimer()
         refreshNotificationPermission()
+        clearDeliveredNotifications()
         syncNotifications()
         syncStepBoundaryTimer()
     }
