@@ -8,7 +8,7 @@ The session and history data is generated for these previews. The [README](../..
 
 | Detail | Value |
 | --- | --- |
-| App source revision | `3b7603b14c92` |
+| App source revision | `b2b141e1472d` |
 | Build | Debug, `VibePomodoro` iOS scheme |
 | Toolchain | Xcode 27.2, build 27B52 |
 | Device | iPhone 18 Pro |
@@ -68,9 +68,9 @@ The selected-day image shows 18 November in Week. Rhythm reads 1h 30m Focus, 30m
 
 | Light | Dark |
 | :---: | :---: |
-| <img src="productivity-empty-light.png" alt="Light empty-history page with zero metrics and no generated bars" width="230"> | <img src="productivity-empty-dark.png" alt="Dark empty-history page with zero metrics and no Sessions card" width="230"> |
+| <img src="productivity-empty-light.png" alt="Light empty-history page with zero totals and no generated bars" width="230"> | <img src="productivity-empty-dark.png" alt="Dark empty-history page with zero totals and no Sessions card" width="230"> |
 
-These launches reset the preview suite and load no history fixture. Totals and Rhythm values are zero. The Week chart keeps its empty tracks, and the Sessions card is omitted. The note explains that a session appears here once it ends.
+These launches reset the preview suite and load no history fixture. Totals and Rhythm values are zero. Daily Focus Avg shows a dash, since no day has focus to average. The Week chart keeps its empty tracks, and the Sessions card is omitted. The note explains that a session appears here once it ends.
 
 ## Settings
 
