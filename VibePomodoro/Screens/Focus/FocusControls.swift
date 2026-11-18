@@ -30,26 +30,104 @@ enum FocusControlColors {
 
 struct FocusStatusTitle: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let text: String
+    /// While a step is paused, Paused follows the phase: a still countdown and a running one look
+    /// alike at a glance.
+    let isPaused: Bool
     let phase: SessionPhase
 
     var body: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(phase.tintColor)
-                .frame(width: 6.5, height: 6.5)
-                .shadow(color: phase.shadowColor.opacity(colorScheme == .dark ? 0.20 : 0.14), radius: 3)
+        // The phase and Paused share a line between the top controls. At accessibility sizes a long
+        // phase name and Paused no longer fit there, and Paused moves under the phase.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) {
+                statusLight
 
-            Text(text)
-                .focusFont(.statusTitle)
-                .tracking(-0.2)
-                .lineLimit(1)
-                .minimumScaleFactor(0.84)
-                .foregroundStyle(FocusControlColors.statusTitleColor(for: colorScheme))
+                HStack(spacing: 0) {
+                    Text(text)
+                    pausedSuffix
+                }
+            }
+            .fixedSize()
+
+            VStack(spacing: 2) {
+                HStack(spacing: 6) {
+                    statusLight
+                    Text(text)
+                }
+
+                if isPaused {
+                    Text("Paused")
+                        .transition(.opacity)
+                }
+            }
+            .fixedSize()
         }
+        .focusFont(.statusTitle)
+        .tracking(-0.2)
+        .lineLimit(1)
+        .foregroundStyle(FocusControlColors.statusTitleColor(for: colorScheme))
         .frame(minHeight: FocusScreenLayout.topActionButtonVisualSize)
+        .animation(
+            reduceMotion ? FocusCompletionMotion.reducedMotionFade : FocusScreenLayout.pausedStatusAnimation,
+            value: isPaused
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(isPaused ? "\(text), paused" : text)
         .zIndex(4)
+    }
+
+    private var statusLight: some View {
+        Circle()
+            .fill(phase.tintColor)
+            .frame(width: 6.5, height: 6.5)
+            .shadow(color: phase.shadowColor.opacity(colorScheme == .dark ? 0.20 : 0.14), radius: 3)
+    }
+
+    /// Paused unfolds from the end of the phase name while the line re-centers around it, so the two
+    /// words never cross. Running, it takes no width.
+    private var pausedSuffix: some View {
+        Text(" · Paused")
+            .fixedSize()
+            .modifier(FocusSoftLeadingReveal(progress: isPaused ? 1 : 0))
+            .frame(width: isPaused ? nil : 0, alignment: .leading)
+            .opacity(isPaused ? 1 : 0)
+    }
+}
+
+/// Shows its content from the leading edge as `progress` goes from 0 to 1. The moving edge is a short
+/// fade rather than a cut, so a letter appears gradually instead of being sliced; at 1 the fade lies
+/// past the end and the content is whole.
+private struct FocusSoftLeadingReveal: ViewModifier, Animatable {
+    var progress: Double
+
+    var animatableData: Double {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    private static let fadeWidth: CGFloat = 14
+
+    func body(content: Content) -> some View {
+        content.mask(alignment: .leading) {
+            GeometryReader { proxy in
+                let edge = max(0, CGFloat(progress) * (proxy.size.width + Self.fadeWidth))
+                let solidShare = edge > 0 ? max(0, edge - Self.fadeWidth) / edge : 0
+
+                LinearGradient(
+                    stops: [
+                        .init(color: .black, location: 0),
+                        .init(color: .black, location: solidShare),
+                        .init(color: .clear, location: 1)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: edge)
+            }
+        }
     }
 }
 

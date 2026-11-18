@@ -146,8 +146,8 @@ private struct FocusTopChrome: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                FocusStatusTitle(text: renderState.statusText, phase: renderState.phase)
-                    .fixedSize(horizontal: true, vertical: false)
+                FocusStatusTitle(text: renderState.statusText, isPaused: renderState.isPaused, phase: renderState.phase)
+                    .frame(maxWidth: layout.statusTitleMaxWidth)
 
                 HStack {
                     FocusActionSlot(size: FocusScreenLayout.topActionButtonHitSize) {

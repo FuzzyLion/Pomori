@@ -121,7 +121,9 @@ Keep controls aligned with the vessel, low on the page with a clear gap above na
 
 A circular `.glass` button owns its visible circle; an outer slot owns hit area and alignment. Keep custom pressed-opacity animations off that surface because the system already provides interaction feedback. Back, Pause/Resume, and Skip may share a sampling region, but their shapes must stay separate. If sampling flicker returns, check their host and `GlassEffectContainer` structure first.
 
-Status reads Ready, Focus, Short Break, or Long Break. The primary control communicates running versus paused. The badge follows its content on one line and remains subordinate to the countdown.
+Status reads Ready, Focus, Short Break, or Long Break, and adds Paused while a step is paused, as in Focus · Paused. Before that, a paused countdown and a running one looked the same at a glance, and only the primary button told them apart. Paused unfolds from the end of the phase name with a soft edge while the line re-centers, in step with the button changing between Pause and Resume, so the two words never overlap. At accessibility sizes, when a long phase and Paused don't fit between the top controls, Paused moves to its own line. The badge remains subordinate to the countdown.
+
+Immersive mode hides the status. I left the numerals as they are there, because numbers that stop changing are already the cue and one tap brings the status back. Dimming them would also take the light face below 3:1.
 
 The status, its note, the primary label, and the summary line follow Dynamic Type. They grow up to the first accessibility size and stop there, because the chrome sits at fixed distances from the vessel and anything larger runs into it. The round controls keep their size. At accessibility sizes a long press on any Focus control, the primary button included, shows the large content viewer. At those sizes the glass button style also shrank their symbols to about three quarters, so the symbols set the medium image scale themselves. The countdown and FOCUSED are part of the vessel and keep their size.
 

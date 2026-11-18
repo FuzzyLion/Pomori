@@ -29,6 +29,13 @@ final class VibePomodoroUITests: XCTestCase {
 
         app.buttons["Pause"].tap()
         XCTAssertTrue(app.buttons["Resume"].waitForExistence(timeout: 2))
+        // The status says the countdown is standing still, not just the button.
+        XCTAssertTrue(element(in: app, containing: "Focus, paused").waitForExistence(timeout: 2), app.debugDescription)
+
+        app.buttons["Resume"].tap()
+        XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 2))
+        XCTAssertFalse(element(in: app, containing: "paused").exists, app.debugDescription)
+        app.buttons["Pause"].tap()
     }
 
     @MainActor
@@ -50,13 +57,9 @@ final class VibePomodoroUITests: XCTestCase {
         }
         XCTAssertFalse(resume.frame.intersects(back.frame) || resume.frame.intersects(skip.frame), app.debugDescription)
 
-        // The status title stays between the top controls.
-        let tabBar = app.tabBars.firstMatch.frame
-        let status = try XCTUnwrap(
-            app.staticTexts.matching(NSPredicate(format: "label == 'Focus'")).allElementsBoundByIndex
-                .first { !tabBar.intersects($0.frame) },
-            app.debugDescription
-        )
+        // The status, which also says Paused, stays between the top controls.
+        let status = element(in: app, containing: "Focus, paused")
+        XCTAssertTrue(status.exists, app.debugDescription)
         XCTAssertGreaterThan(status.frame.minX, reset.frame.maxX, app.debugDescription)
         XCTAssertLessThan(status.frame.maxX, finish.frame.minX, app.debugDescription)
         attachScreenshot(named: "focus-largest-text")
