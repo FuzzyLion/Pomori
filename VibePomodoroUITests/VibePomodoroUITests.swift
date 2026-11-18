@@ -104,6 +104,7 @@ final class VibePomodoroUITests: XCTestCase {
 
         XCTAssertTrue(app.navigationBars["Productivity"].waitForExistence(timeout: 8), app.debugDescription)
         XCTAssertTrue(app.staticTexts["No finished sessions yet"].exists)
+        XCTAssertEqual(app.otherElements["Daily Focus Avg"].value as? String, "No days with focus yet", app.debugDescription)
         XCTAssertTrue(app.staticTexts["Sessions appear here once they end, including ones you finish early. A session in progress isn't counted until then."].exists)
         XCTAssertTrue(app.staticTexts["Rhythm"].exists)
         XCTAssertFalse(app.staticTexts["Sessions"].exists)

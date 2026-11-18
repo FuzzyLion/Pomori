@@ -320,7 +320,8 @@ struct VibePomodoroTests {
         #expect(store.productivityCache.dailySummaries.count == 2)
         #expect(store.productivityCache.dailySummaries.map(\.focusTime) == [10.0 * 60.0, 10.0 * 60.0])
         #expect(store.productivityCache.dailySummaries.map(\.completedFocusCount) == [0, 1])
-        #expect(abs(store.productivityCache.averageFocusHoursPerDay - (1.0 / 6.0)) < 0.0001)
+        let average = try #require(store.productivityCache.averageFocusHoursPerDay)
+        #expect(abs(average - (1.0 / 6.0)) < 0.0001)
     }
 
     @Test func sessionCompletionUpdatesCacheOnceAndDoesNotDoubleCountOnRelaunch() async throws {
@@ -989,11 +990,41 @@ struct VibePomodoroTests {
                 && point.breakTime == 0
                 && point.completedFocusCount == 0
         })
+        #expect(store.productivityCache.averageFocusHoursPerDay == nil)
+    }
+
+    @Test func dailyFocusAverageHasNoValueWithoutAFocusDay() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        let calendar = Calendar(identifier: .gregorian)
+        let start = try #require(calendar.date(from: DateComponents(year: 2026, month: 3, day: 10, hour: 9)))
+        let end = start.addingTimeInterval(5 * 60)
+        // A session whose focus was skipped at once and whose break ran: finished, but no focus day.
+        let breakOnly = makeCompletedSession(
+            settings: .default,
+            createdAt: start,
+            completedAt: end,
+            segments: [
+                makeSegment(phase: .shortBreak, roundNumber: 1, startDate: start, endDate: end)
+            ]
+        )
+
+        saveValue([breakOnly], for: TestStorageKey.completedSessions, defaults: defaults)
+
+        let store = PomodoroStore(defaults: defaults)
+
+        #expect(store.productivityCache.completedSessionCount == 1)
+        #expect(store.productivityCache.averageFocusHoursPerDay == nil)
+        #expect(store.productivitySnapshot(for: .week, now: end).averageFocusHoursPerDay == nil)
     }
 
     @Test func productivityEmptySummaryFormattingUsesZeroStateText() async throws {
         #expect(ProductivityValueFormatting.lifetimeDurationText(0) == "0m")
-        #expect(ProductivityValueFormatting.summaryAverageFocusText(0) == "0m")
+        #expect(ProductivityValueFormatting.summaryAverageFocusText(nil) == "—")
+        #expect(ProductivityValueFormatting.summaryAverageFocusActiveDayAccessibilityValue(nil) == "No days with focus yet")
+        // A measured average under half a minute still rounds to 0m; only "no days" gets the dash.
+        #expect(ProductivityValueFormatting.summaryAverageFocusText(20.0 / 3_600) == "0m")
         #expect(ProductivityValueFormatting.summaryStreakText(0) == "0d")
         #expect(ProductivityValueFormatting.summaryMetaText(sessionTime: 0, completedSessionCount: 0, completedFocusCount: 0) == "No finished sessions yet")
     }

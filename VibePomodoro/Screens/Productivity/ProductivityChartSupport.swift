@@ -59,7 +59,11 @@ enum ProductivityValueFormatting {
         return minuteUnitText(minutes)
     }
 
-    static func summaryAverageFocusText(_ hoursPerDay: Double) -> String {
+    /// A dash until a day has recorded focus, since there is nothing to average yet. A real average
+    /// that rounds below a minute still reads 0m.
+    static func summaryAverageFocusText(_ hoursPerDay: Double?) -> String {
+        guard let hoursPerDay else { return "—" }
+
         let totalMinutes = max(0, Int((hoursPerDay * 60).rounded()))
         let hours = totalMinutes / 60
         let minutes = totalMinutes % 60
@@ -81,8 +85,10 @@ enum ProductivityValueFormatting {
         return minuteUnitText(totalMinutes)
     }
 
-    static func summaryAverageFocusActiveDayAccessibilityValue(_ hoursPerDay: Double) -> String {
-        "\(summaryAverageFocusAccessibilityValue(hoursPerDay)) average focus time across active days"
+    static func summaryAverageFocusActiveDayAccessibilityValue(_ hoursPerDay: Double?) -> String {
+        guard let hoursPerDay else { return "No days with focus yet" }
+
+        return "\(summaryAverageFocusAccessibilityValue(hoursPerDay)) average focus time across active days"
     }
 
     static func summaryStreakText(_ streakLength: Int) -> String {

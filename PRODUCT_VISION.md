@@ -160,7 +160,7 @@ Productivity uses effective running time from archived sessions. A session enter
 
 Clear Productivity History removes completed records and the aggregate cache. The page immediately returns to an empty history; later sessions begin a fresh one. The active session and settings survive.
 
-With no archive, the summary and Rhythm show zeros and No finished sessions yet. Leave out the Sessions card and explain that sessions appear when they end, including ones finished early. Generated bars belong only in tests and labeled documentation previews.
+With no archive, the summary and Rhythm show zeros and No finished sessions yet. Daily Focus Avg shows a dash until a day has recorded focus. It divides by those days, so with none there is no average, and 0m looked like a measured one. Leave out the Sessions card and explain that sessions appear when they end, including ones finished early. Generated bars belong only in tests and labeled documentation previews.
 
 ### Hierarchy and ranges
 
