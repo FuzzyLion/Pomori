@@ -5,6 +5,7 @@
 //  Created by Qi Wu on 15.03.26.
 //
 
+import UIKit
 import XCTest
 
 final class VibePomodoroUITests: XCTestCase {
@@ -28,6 +29,72 @@ final class VibePomodoroUITests: XCTestCase {
 
         app.buttons["Pause"].tap()
         XCTAssertTrue(app.buttons["Resume"].waitForExistence(timeout: 2))
+        // The status says the countdown is standing still, not just the button.
+        XCTAssertTrue(element(in: app, containing: "Focus, paused").waitForExistence(timeout: 2), app.debugDescription)
+
+        app.buttons["Resume"].tap()
+        XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 2))
+        XCTAssertFalse(element(in: app, containing: "paused").exists, app.debugDescription)
+        app.buttons["Pause"].tap()
+    }
+
+    @MainActor
+    func testFocusChromeFitsAtTheLargestTextSize() throws {
+        let app = makeCleanApp(
+            arguments: ["--appearance-light", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"],
+            environment: ["VIBE_FOCUS_FIXTURE": "focus-2-0.5"]
+        )
+        app.launch()
+
+        let resume = app.buttons["Resume"]
+        XCTAssertTrue(resume.waitForExistence(timeout: 8), app.debugDescription)
+        let reset = app.buttons["Reset current step"]
+        let finish = app.buttons["Finish session early"]
+        let back = app.buttons["Back to last step"]
+        let skip = app.buttons["Skip current step"]
+        for control in [resume, reset, finish, back, skip] {
+            XCTAssertTrue(control.isHittable, "\(control.label) is not hittable\n\(app.debugDescription)")
+        }
+        XCTAssertFalse(resume.frame.intersects(back.frame) || resume.frame.intersects(skip.frame), app.debugDescription)
+
+        // The status, which also says Paused, stays between the top controls.
+        let status = element(in: app, containing: "Focus, paused")
+        XCTAssertTrue(status.exists, app.debugDescription)
+        XCTAssertGreaterThan(status.frame.minX, reset.frame.maxX, app.debugDescription)
+        XCTAssertLessThan(status.frame.maxX, finish.frame.minX, app.debugDescription)
+        attachScreenshot(named: "focus-largest-text")
+
+        // A finished session's breakdown fits on the page above Done.
+        finish.tap()
+        app.alerts.buttons["Finish session early"].tap()
+        let done = app.buttons["Done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 4), app.debugDescription)
+        let caption = element(in: app, containing: "focus blocks")
+        XCTAssertTrue(caption.waitForExistence(timeout: 4), app.debugDescription)
+        let window = app.windows.firstMatch.frame
+        XCTAssertGreaterThanOrEqual(caption.frame.minX, window.minX, app.debugDescription)
+        XCTAssertLessThanOrEqual(caption.frame.maxX, window.maxX, app.debugDescription)
+        XCTAssertLessThanOrEqual(caption.frame.maxY, done.frame.minY, app.debugDescription)
+        attachScreenshot(named: "focus-largest-text-finished")
+    }
+
+    @MainActor
+    func testFocusStaysInPortraitWhenThePhoneTurns() throws {
+        try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .phone, "Only iPhone is limited to portrait.")
+        let app = makeCleanApp()
+        app.launch()
+        XCTAssertTrue(app.buttons["Start"].waitForExistence(timeout: 8), app.debugDescription)
+
+        addTeardownBlock {
+            await MainActor.run { XCUIDevice.shared.orientation = .portrait }
+        }
+        XCUIDevice.shared.orientation = .landscapeLeft
+        // Give the system time to rotate the interface if the app allowed it.
+        RunLoop.current.run(until: Date().addingTimeInterval(1.5))
+
+        let window = app.windows.firstMatch.frame
+        XCTAssertLessThan(window.width, window.height, app.debugDescription)
+        XCTAssertTrue(app.buttons["Start"].isHittable, app.debugDescription)
     }
 
     @MainActor
@@ -116,9 +183,15 @@ final class VibePomodoroUITests: XCTestCase {
         func uncoveredBar() -> XCUIElement? {
             todaysBars.allElementsBoundByIndex.first { $0.frame.minY > visibleTop && $0.frame.maxY < visibleBottom }
         }
+        // Short drags held before release, towards the bar: a full swipe could fling the column from
+        // under the tab bar to above the navigation bar in one go.
         var candidate = uncoveredBar()
-        for _ in 0..<3 where candidate == nil {
-            app.swipeUp()
+        for _ in 0..<8 where candidate == nil {
+            guard let bar = todaysBars.allElementsBoundByIndex.first else { break }
+            let barIsAbove = bar.frame.minY <= visibleTop
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: barIsAbove ? 0.35 : 0.65))
+            let end = start.withOffset(CGVector(dx: 0, dy: (barIsAbove ? 1 : -1) * app.frame.height * 0.25))
+            start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 0.3)
             candidate = uncoveredBar()
         }
         let todaysBar = try XCTUnwrap(candidate, app.debugDescription)

@@ -1,6 +1,6 @@
 # Screenshot gallery
 
-These 21 screenshots were captured from the built app on 10 November 2026, using iPhone 18 Pro / iOS 27.2. The PNGs are full-resolution simulator captures with no retouching. Markdown scales them for display.
+These 21 screenshots were captured from the built app on 18 November 2026, using iPhone 18 Pro / iOS 27.2. The PNGs are full-resolution simulator captures with no retouching. Markdown scales them for display.
 
 The session and history data is generated for these previews. The [README](../../README.md) uses a smaller selection; [PRODUCT_VISION.md](../../PRODUCT_VISION.md) explains the design and behavior.
 
@@ -8,7 +8,7 @@ The session and history data is generated for these previews. The [README](../..
 
 | Detail | Value |
 | --- | --- |
-| App source revision | `df83d85be566` |
+| App source revision | `3b7603b14c92` |
 | Build | Debug, `VibePomodoro` iOS scheme |
 | Toolchain | Xcode 27.2, build 27B52 |
 | Device | iPhone 18 Pro |
@@ -24,7 +24,7 @@ The source revision identifies the app code in the captures. Rolling-window labe
 
 ## Focus and breaks
 
-Each phase is paused halfway through its current step. That keeps the liquid and countdown still for comparison. The outline and color change between phases; the baseline and numeral treatment stay the same.
+Each phase is paused halfway through its current step, so the status reads Focus · Paused and so on. That keeps the liquid and countdown still for comparison. The outline and color change between phases; the baseline and numeral treatment stay the same.
 
 | Phase | Light | Dark |
 | --- | :---: | :---: |
@@ -52,17 +52,17 @@ The populated previews use the existing `long-extreme` UI-testing fixture, which
 | :---: | :---: | :---: |
 | <img src="productivity-light.png" alt="Light all-time summary and Week chart with generated history" width="230"> | <img src="productivity-dark.png" alt="Dark all-time summary and Week chart with generated history" width="230"> | <img src="productivity-detail-light.png" alt="Light Productivity page scrolled to the Week chart and recent-session rows" width="230"> |
 
-The overview images start at the top. The detail image is scrolled to Rhythm and Sessions, leaving part of the all-time card above the screen. The native tab bar floats above the content.
+The overview images start at the top, where the whole Rhythm card fits above the tab bar. Its upper right names the window and dates. The detail image is scrolled to Rhythm and Sessions, leaving part of the all-time card above the screen. The native tab bar floats above the content.
 
 ### Ranges and selection
 
 | Month | Year | Selected day |
 | :---: | :---: | :---: |
-| <img src="productivity-month-light.png" alt="Thirty daily stacked bars in the rolling Month window" width="230"> | <img src="productivity-year-light.png" alt="Twelve monthly stacked bars in the rolling Year window" width="230"> | <img src="productivity-selected-light.png" alt="Tuesday 10 November selected, with one matching session and other bars dimmed" width="230"> |
+| <img src="productivity-month-light.png" alt="Thirty daily stacked bars in the rolling Month window" width="230"> | <img src="productivity-year-light.png" alt="Twelve monthly stacked bars in the rolling Year window" width="230"> | <img src="productivity-selected-light.png" alt="Wednesday 18 November selected, with one matching session and other bars dimmed" width="230"> |
 
 These captures keep the same scroll position. Month shows 30 daily bars without background glass columns; Year groups by calendar month.
 
-The selected-day image shows 10 November in Week. Rhythm reads 1h 30m Focus, 30m Breaks, and 1 Block, and Sessions shows the one session that started that day. Changing range clears the selection. The all-time summary keeps its totals.
+The selected-day image shows 18 November in Week. Rhythm reads 1h 30m Focus, 30m Breaks, and 1 Block, and Sessions shows the one session that started that day. Changing range clears the selection. The all-time summary keeps its totals.
 
 ### Empty history
 
@@ -147,11 +147,11 @@ Repeat with `dark` and the matching output filename. The existing Focus fixture 
 | `productivity` | `VIBE_PRODUCTIVITY_FIXTURE=long-extreme`, with `--open-productivity`. |
 | `productivity-empty` | No fixture, with `--open-productivity`. |
 | `productivity-detail-light` | Launch populated Week in light mode and scroll to Rhythm and Sessions. |
-| `productivity-selected-light` | In that detail view, tap the last day, 10 November in this capture. |
+| `productivity-selected-light` | In that detail view, tap the last day, 18 November in this capture. |
 | `productivity-month-light` | Open Time Range and choose Month, retaining the detail scroll position. |
 | `productivity-year-light` | Open Time Range and choose Year, retaining the detail scroll position. |
 | `settings` | No session or history fixture, with `--open-settings`. |
-| `settings-picker` | Launch Settings and tap the Focus row. Leave the wheel at 25 minutes. |
+| `settings-picker` | `--open-settings --expand-focus-settings-picker`, which opens the Focus wheel at 25 minutes without a tap. |
 
 With `simctl`, app environment variables need the `SIMCTL_CHILD_` prefix. These commands capture populated Productivity, empty Productivity, and Settings:
 

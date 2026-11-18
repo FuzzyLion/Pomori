@@ -122,6 +122,8 @@ enum FocusPrimaryAction: Equatable {
 struct FocusRenderState: Equatable {
     let phase: SessionPhase
     let statusText: String
+    /// The current step is paused; the status says so after the phase.
+    let isPaused: Bool
     /// A short note under the status, shown when a session was finished early.
     let statusDetail: String?
     let primaryAction: FocusPrimaryAction
@@ -160,6 +162,7 @@ struct FocusRenderState: Equatable {
             statusText: isComplete
                 ? (endedEarly ? "Session finished" : "Session complete")
                 : (session == nil ? "Ready" : phase.title),
+            isPaused: runState == .paused,
             statusDetail: endedEarly ? "Saved what you completed so far." : nil,
             primaryAction: primaryAction(for: runState),
             canSkip: !isComplete && session?.currentStep != nil,

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var store: PomodoroStore
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State private var isFocusTabBarVisuallyHidden = false
 
     var body: some View {
@@ -31,7 +33,7 @@ struct ContentView: View {
                     Label("Settings", systemImage: "gearshape")
                 }
         }
-        .tint(VibePalette.warmAmberAccent)
+        .tint(VibePalette.interfaceTint(for: colorScheme, contrast: colorSchemeContrast))
         .background {
             SystemTabBarVisibilityBridge(isHidden: isFocusTabBarVisuallyHidden)
                 .allowsHitTesting(false)

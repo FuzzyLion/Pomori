@@ -57,6 +57,9 @@ struct FocusPageContent: View {
                     onSkip: store.skipCurrentStep
                 )
             }
+            // The chrome sits at fixed offsets around the vessel, so its text stops growing where that
+            // layout still fits.
+            .dynamicTypeSize(...FocusScreenLayout.largestTextSize)
             // When a session ends, and when Done closes it, the status, the markers, and the
             // controls change over together rather than switching at once.
             .animation(
@@ -108,7 +111,7 @@ private struct FocusSummaryCaptionChrome: View {
         ZStack {
             if let caption {
                 Text(caption)
-                    .font(.system(size: 13, weight: .medium, design: .default))
+                    .focusFont(.summaryCaption)
                     .monospacedDigit()
                     .foregroundStyle(FocusControlColors.captionColor(for: colorScheme))
                     .lineLimit(1)
@@ -143,8 +146,8 @@ private struct FocusTopChrome: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                FocusStatusTitle(text: renderState.statusText, phase: renderState.phase)
-                    .fixedSize(horizontal: true, vertical: false)
+                FocusStatusTitle(text: renderState.statusText, isPaused: renderState.isPaused, phase: renderState.phase)
+                    .frame(maxWidth: layout.statusTitleMaxWidth)
 
                 HStack {
                     FocusActionSlot(size: FocusScreenLayout.topActionButtonHitSize) {
@@ -167,7 +170,7 @@ private struct FocusTopChrome: View {
             ZStack {
                 if let detail = renderState.statusDetail {
                     Text(detail)
-                        .font(.system(size: 14, weight: .medium, design: .default))
+                        .focusFont(.statusDetail)
                         .foregroundStyle(FocusControlColors.captionColor(for: colorScheme))
                         .multilineTextAlignment(.center)
                         .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: -4)))

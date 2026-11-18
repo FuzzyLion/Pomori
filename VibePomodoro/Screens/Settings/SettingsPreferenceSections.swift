@@ -210,6 +210,7 @@ struct SettingsOtherSection: View {
         } message: {
             Text("This action can't be undone. Current session and timer settings will stay as they are.")
         }
+        .alertButtonTint()
     }
 
     private var hasProductivityHistory: Bool {

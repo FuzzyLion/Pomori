@@ -9,8 +9,6 @@ enum ProductivityLayout {
     enum TrendGroup {
         static let populatedTopInset: CGFloat = 8
         static let emptyTopInset: CGFloat = 4
-        static let captionSpacing: CGFloat = 10
-        static let captionHorizontalPadding: CGFloat = 6
     }
 
     enum SummaryCard {
@@ -31,6 +29,7 @@ enum ProductivityLayout {
 
     enum PrimaryMetric {
         static let spacing: CGFloat = 10
+        static let scopeSpacing: CGFloat = 12
         static let titleTracking: CGFloat = 0.65
         static let accessibilityMinimumScaleFactor: CGFloat = 0.9
         static let defaultMinimumScaleFactor: CGFloat = 0.72
@@ -155,28 +154,23 @@ struct ProductivityScreen: View {
                             ProductivityEmptyStateNote()
                         }
 
-                        VStack(alignment: .leading, spacing: ProductivityLayout.TrendGroup.captionSpacing) {
-                            ProductivityRangeCaption(
+                        // The Rhythm card names its window itself, so nothing sits between the cards and the
+                        // whole chart clears the tab bar on first view.
+                        VStack(alignment: .leading, spacing: ProductivityLayout.sectionSpacing) {
+                            ProductivityRhythmCard(
+                                buckets: renderState.displayBuckets,
                                 range: renderState.selectedRange,
-                                buckets: renderState.displayBuckets
+                                selectedSlot: $selectedSlot
                             )
 
-                            VStack(alignment: .leading, spacing: ProductivityLayout.sectionSpacing) {
-                                ProductivityRhythmCard(
+                            // With no history, the empty-state note above already says what will appear here.
+                            if !renderState.showsEmptyState {
+                                ProductivitySessionsCard(
+                                    sessions: store.completedSessions,
                                     buckets: renderState.displayBuckets,
                                     range: renderState.selectedRange,
-                                    selectedSlot: $selectedSlot
+                                    selectedSlot: selectedSlot
                                 )
-
-                                // With no history, the empty-state note above already says what will appear here.
-                                if !renderState.showsEmptyState {
-                                    ProductivitySessionsCard(
-                                        sessions: store.completedSessions,
-                                        buckets: renderState.displayBuckets,
-                                        range: renderState.selectedRange,
-                                        selectedSlot: selectedSlot
-                                    )
-                                }
                             }
                         }
                         .padding(.top, renderState.trendTopInset)

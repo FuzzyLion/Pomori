@@ -1,25 +1,6 @@
 import Charts
 import SwiftUI
 
-struct ProductivityRangeCaption: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let range: ProductivityRange
-    let buckets: [ProductivityDisplayBucket]
-
-    var body: some View {
-        let dates = ProductivityChartFormatting.rangeDatesText(for: buckets, range: range)
-        let caption = "\(range.windowTitle) • \(dates)"
-
-        Text(caption)
-            .productivityFont(.caption)
-            .foregroundStyle(ProductivityTextColors.secondary(colorScheme))
-            .monospacedDigit()
-            .padding(.horizontal, ProductivityLayout.TrendGroup.captionHorizontalPadding)
-            .accessibilityLabel("\(range.windowTitle), \(dates)")
-    }
-}
-
 /// Focus and breaks per slot, stacked like layered liquid, with the range's totals above.
 struct ProductivityRhythmCard: View {
     @Environment(\.colorScheme) private var colorScheme
@@ -52,13 +33,13 @@ struct ProductivityRhythmCard: View {
 
                 Spacer(minLength: ProductivityLayout.TrendCard.headerSpacing)
 
-                if !isAccessibilitySize, let selectionText {
-                    selectionLabel(selectionText)
+                if !isAccessibilitySize {
+                    headerDetail(selectionText: selectionText, alignment: .trailing)
                 }
             }
 
-            if isAccessibilitySize, let selectionText {
-                selectionLabel(selectionText)
+            if isAccessibilitySize {
+                headerDetail(selectionText: selectionText, alignment: .leading)
             }
 
             ProductivityRhythmStats(
@@ -89,7 +70,39 @@ struct ProductivityRhythmCard: View {
         }
     }
 
-    private func selectionLabel(_ text: String) -> some View {
+    /// The old label is gone before the new one arrives. Both sit at the same edge, and a plain
+    /// cross-fade laid one date's letters over the other's for a few frames.
+    private static let detailTransition = AnyTransition.asymmetric(
+        insertion: .opacity.animation(.easeOut(duration: 0.16).delay(0.1)),
+        removal: .opacity.animation(.easeIn(duration: 0.1))
+    )
+
+    /// The chart's window and dates, or a tapped slot's date in their place. They fade where they stand
+    /// rather than sliding, since their widths differ.
+    private func headerDetail(selectionText: String?, alignment: Alignment) -> some View {
+        let dates = ProductivityChartFormatting.rangeDatesText(for: buckets, range: range)
+        let lines = ProductivityChartFormatting.rangeCaptionLines(for: buckets, range: range)
+
+        return ZStack(alignment: alignment) {
+            if let selectionText {
+                detailLabel(selectionText)
+                    .id("slot \(selectionText)")
+                    .transition(Self.detailTransition)
+            } else {
+                // The longest line that fits; VoiceOver always hears the whole window.
+                ViewThatFits(in: .horizontal) {
+                    ForEach(lines, id: \.self) { line in
+                        detailLabel(line)
+                            .accessibilityLabel("\(range.windowTitle), \(dates)")
+                    }
+                }
+                .id("range \(range.windowTitle) \(dates)")
+                .transition(Self.detailTransition)
+            }
+        }
+    }
+
+    private func detailLabel(_ text: String) -> some View {
         Text(text)
             .productivityFont(.caption)
             .foregroundStyle(ProductivityTextColors.secondary(colorScheme))

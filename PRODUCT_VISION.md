@@ -8,7 +8,7 @@ I make the product and design decisions and review the app hands-on. Much of the
 
 ## What I'm building
 
-The app has three pages, Focus, Productivity, and Settings, and requires iOS 26.2 or later. I have archived the native macOS and Live Activity experiments. They are outside the active product.
+The app has three pages, Focus, Productivity, and Settings, and requires iOS 26.2 or later. On iPhone it only runs in portrait. Focus is laid out around the vessel for a tall screen. In landscape the top of the vessel was cut off and the controls ended up under the tab bar. A landscape layout for a phone on a desk stand would need its own design, so I locked the orientation for now. I have archived the native macOS and Live Activity experiments. They are outside the active product.
 
 The app supports timestamp-based timing, background and relaunch recovery, focus and break cycles, early completion, an in-place completion summary, local history, interactive productivity charts, local notifications, event sounds, haptics, and appearance preferences. Send Feedback and Share App remain placeholders marked Soon.
 
@@ -18,7 +18,7 @@ SwiftData, iCloud sync, advanced analytics, imported sounds, and more elaborate 
 
 ### The app today
 
-These are direct captures of the current build on iPhone 18 Pro / iOS 27.2, taken on 10 November 2026. The Focus session is a paused demonstration, and Productivity contains generated test history. Both appearances use the same fixture recipes. Productivity and Settings scroll beyond the captured viewport.
+These are direct captures of the current build on iPhone 18 Pro / iOS 27.2, taken on 18 November 2026. The Focus session is a paused demonstration, and Productivity contains generated test history. Both appearances use the same fixture recipes. Productivity and Settings scroll beyond the captured viewport.
 
 | Page | Light | Dark |
 | --- | :---: | :---: |
@@ -121,7 +121,11 @@ Keep controls aligned with the vessel, low on the page with a clear gap above na
 
 A circular `.glass` button owns its visible circle; an outer slot owns hit area and alignment. Keep custom pressed-opacity animations off that surface because the system already provides interaction feedback. Back, Pause/Resume, and Skip may share a sampling region, but their shapes must stay separate. If sampling flicker returns, check their host and `GlassEffectContainer` structure first.
 
-Status reads Ready, Focus, Short Break, or Long Break. The primary control communicates running versus paused. The badge follows its content on one line and remains subordinate to the countdown.
+Status reads Ready, Focus, Short Break, or Long Break, and adds Paused while a step is paused, as in Focus · Paused. Before that, a paused countdown and a running one looked the same at a glance, and only the primary button told them apart. Paused unfolds from the end of the phase name with a soft edge while the line re-centers, in step with the button changing between Pause and Resume, so the two words never overlap. At accessibility sizes, when a long phase and Paused don't fit between the top controls, Paused moves to its own line. The badge remains subordinate to the countdown.
+
+Immersive mode hides the status. I left the numerals as they are there, because numbers that stop changing are already the cue and one tap brings the status back. Dimming them would also take the light face below 3:1.
+
+The status, its note, the primary label, and the summary line follow Dynamic Type. They grow up to the first accessibility size and stop there, because the chrome sits at fixed distances from the vessel and anything larger runs into it. The round controls keep their size. At accessibility sizes a long press on any Focus control, the primary button included, shows the large content viewer. At those sizes the glass button style also shrank their symbols to about three quarters, so the symbols set the medium image scale themselves. The countdown and FOCUSED are part of the vessel and keep their size.
 
 One compact marker represents each focus round. The current focus round is half filled. A past round fills only when its focus block reached the full duration; skipped and early-finished blocks remain outlined. Future markers stay subdued. The same completed-block meaning carries into Productivity.
 
@@ -162,11 +166,11 @@ With no archive, the summary and Rhythm show zeros and No finished sessions yet.
 
 Keep the system large title and an icon-only range `Menu` in the trailing toolbar. Its Week, Month, and Year entries are toggles so iOS supplies the selected checkmark, including at accessibility text sizes. Use system toolbar material.
 
-The first card is headed ALL TIME COMPLETED SESSIONS. I put Focus Time first because Session Time also increases with longer breaks. Daily Focus Avg and Streak sit below it. The footer keeps Session Time, finished-session count, and completed focus-block count available without giving them equal weight.
+The first card opens with FOCUS TIME on the left and ALL TIME on the right. I put Focus Time first because Session Time also increases with longer breaks. Daily Focus Avg and Streak sit below it. The footer keeps Session Time, finished-session count, and completed focus-block count available without giving them equal weight.
 
 A block is one focus round; a session is the whole cycle. Lifetime time stays in hours so it cannot be confused with the streak's days. From 100 hours onward, omit minutes.
 
-That summary always stays all-time. A quiet caption below it names the chart window and dates. Rhythm and Sessions follow, without title icons or range badges.
+That summary always stays all-time. The Rhythm card names its window and dates at its upper right, such as Last 7 days • 12–18 Nov. The line never wraps and never ends in an ellipsis, since a second line looked messy and an ellipsis hid the end of the dates. When it doesn't fit beside the title, it drops what the rest already says: first the years of a rolling year, as in Last 12 months • Dec – Nov, then the window's name, as in 20 Oct – 18 Nov. VoiceOver always reads the whole window. That used to be a caption between the two cards, under a separate ALL TIME COMPLETED SESSIONS heading, and together they pushed the chart's day labels under the tab bar on first view. Now the whole Rhythm card clears the tab bar on an iPhone 14 Pro. Rhythm and Sessions follow, without title icons or range badges.
 
 | Range | Window | Slots |
 | --- | --- | --- |
@@ -184,7 +188,7 @@ A dashed line marks average focus across slots with any focus, matching the acti
 
 Use a fixed-width value-axis column with round steps and at most four intervals. Up to one hour, show 0–60 minutes in 20-minute steps. Above that, use whole hours so axis labels do not need minute components.
 
-Tapping a slot places its date at the Rhythm card's upper right, replaces the top row with that slot's figures, and dims other bars. Keep numeric columns fixed. The current month names its elapsed dates, such as 1–10 Nov. The Sessions card then shows the latest five sessions that started in that slot, newest first, followed by a count such as 29 more when needed.
+Tapping a slot puts its date in place of the window at the Rhythm card's upper right, replaces the top row with that slot's figures, and dims other bars. The window fades out before the date fades in, because a plain cross-fade laid one date's letters over the other's. Keep numeric columns fixed. The current month names its elapsed dates, such as 1–10 Nov. The Sessions card then shows the latest five sessions that started in that slot, newest first, followed by a count such as 29 more when needed.
 
 Tap the selected slot again or tap the value-axis labels to return to the whole range. Changing the range clears the selection. Selection is tap-only, so starting a drag over the chart still scrolls the page.
 
@@ -194,7 +198,7 @@ Without a selection, Sessions lists the latest five starts in the range. Each ro
 
 All three cards use regular material, with more visual weight on the summary. I keep SF Pro and monospaced digits on this page. Didot works inside the Focus vessel, but repeating it across statistics adds a second voice and crowds the metric row. Amber marks focus, jade marks breaks, and other text stays neutral. Summary focus labels use amber ink, deeper in light mode and lighter in dark mode.
 
-Card text must reach at least 4.5:1 contrast in both appearances and strengthen with Increase Contrast. Typography follows system text styles. At accessibility sizes, summary metrics and Rhythm figures stack; a selected date takes its own line; session starts move above their markers and focus time. Axis text caps at xxLarge to preserve chart width; the selected date and figures above the chart provide the detail at larger sizes. The range button keeps the system bar-item size.
+Card text must reach at least 4.5:1 contrast in both appearances and strengthen with Increase Contrast. Typography follows system text styles. At accessibility sizes, summary metrics and Rhythm figures stack; the window or a selected date takes its own line; session starts move above their markers and focus time. Axis text caps at xxLarge to preserve chart width; the selected date and figures above the chart provide the detail at larger sizes. The range button keeps the system bar-item size.
 
 VoiceOver reads each slot's date, focus, breaks, and blocks, and each session's start, completed rounds, and focus time. Each slot's accessibility frame covers exactly its own column and activates that selection.
 
@@ -229,7 +233,7 @@ Light mode uses warm white, mist gray, and pale gold. Both waves must remain vis
 
 Content cards use regular material. In light mode a white lift, one-pixel rim, and soft shadow make them read as panels. Dark mode keeps them deep warm gray so glass controls remain distinct. Their material should retain its hierarchy when system Liquid Glass tuning or iOS 27 Appearance settings change.
 
-SF Symbols are usually single-color. Accents mark phases, selected items, and meaningful states. External assets stay limited to the icon's vector source, restrained visual details, and bundled sounds. A photo library and imported sound collection are outside the MVP.
+SF Symbols are usually single-color. Accents mark phases, selected items, and meaningful states. The app tint colors the selected tab. In light mode the warm accent only reached about 2.8:1 on the tab bar, so light mode uses the amber ink, which reaches about 5:1. Dark mode keeps the warm accent, and Increase Contrast deepens both. Switches set their own warm amber and don't follow the tint. Alert buttons use neutral text, dark gray in light mode and warm white in dark mode. Their glass shows whatever sits behind the alert, and over the amber vessel an amber label dropped to about 3:1, or 2:1 in dark mode. Neutral text stays above 5.7:1 in both. The tab keeps its amber because it marks the page you are on. External assets stay limited to the icon's vector source, restrained visual details, and bundled sounds. A photo library and imported sound collection are outside the MVP.
 
 The icon uses the same vessel outlines as Focus, sized by default phase duration. Amber Focus is largest and sits low on the left; jade Long Break floats higher on the right; mist Short Break is smallest and highest. I separated them because the nested version read as a target or an eye, while a composition around the upright Focus shape looked like an egg. Separate shapes rising at different heights read more clearly as bubbles.
 

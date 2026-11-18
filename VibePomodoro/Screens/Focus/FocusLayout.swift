@@ -15,10 +15,15 @@ struct FocusScreenLayout {
     static let bottomSecondaryButtonSize: CGFloat = 50
     static let bottomPrimaryButtonHeight: CGFloat = 52
     static let bottomPrimaryButtonMinWidth: CGFloat = 176
+    /// The chrome's text grows with Dynamic Type up to this size. Above it the layout around the vessel
+    /// would run out of room, so the controls offer the large content viewer instead.
+    static let largestTextSize: DynamicTypeSize = .accessibility1
     static let layoutSettlingEpsilon: CGFloat = 1
     static let immersiveLayoutRestoreFallbackDelay: Duration = .milliseconds(450)
     static let immersiveVisualFadeAnimation = Animation.easeOut(duration: 0.18)
     static let phaseMorphAnimation = Animation.easeInOut(duration: 0.34)
+    /// Paused unfolding after the phase, close to the primary button's own change from Pause to Resume.
+    static let pausedStatusAnimation = Animation.easeInOut(duration: 0.32)
     static let phaseChromeBreathInAnimation = Animation.easeOut(duration: 0.18)
     static let phaseChromeBreathOutAnimation = Animation.easeInOut(duration: 0.24)
     static let phaseChromeBreathHoldDuration: UInt64 = 90_000_000
@@ -41,6 +46,11 @@ struct FocusScreenLayout {
 
     var topChromePadding: CGFloat {
         max(6, safeAreaInsets.top - 50)
+    }
+
+    /// Room for the status between the top controls, keeping the inner spacing on both sides.
+    var statusTitleMaxWidth: CGFloat {
+        max(0, size.width - 2 * (Self.topChromeHorizontalPadding + Self.topActionButtonHitSize + Self.topChromeInnerSpacing))
     }
 
     /// Global y of the bubble center in the regular layout.
