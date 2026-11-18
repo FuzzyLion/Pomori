@@ -79,9 +79,20 @@ A phase ending and its successor starting form one boundary event with one respo
 | Reset | `phase-reset-notification.caf` | Soft impact |
 | Session complete | `session-complete-thud.caf` | Success |
 
-Local notifications carry the boundary or completion sound while the app is backgrounded or the phone is locked. The app does not drive background haptics. Settings adjustments have their own gentle haptic response; silently normalizing an older saved value must not trigger one.
+When the app isn't open in front, a notification marks each boundary as it happens and carries that event's sound. It says what ended, what runs now and for how long. The end of the session gets its own notification with the recorded focus and the completed blocks, worded like the summary on Focus. While the app is open and active, its own sound and haptic are the only response, so nothing plays twice. Behind Control Center or the app switcher the app can't respond by itself, so the notification shows there as well. The app does not drive background haptics. Settings adjustments have their own gentle haptic response; silently normalizing an older saved value must not trigger one.
 
-I ask for notification permission on the first Start. At launch, the user hasn't done anything that needs a reminder yet. Permission is read again whenever the app returns to the foreground, since it may have changed in iOS Settings.
+| Moment | Title | Body |
+| --- | --- | --- |
+| Focus ends, short break starts | Focus complete | Short break, 5 min. |
+| Short break ends, focus starts | Break over | Focus round 2 of 4, 25 min. |
+| Final focus ends, long break starts | Focus complete | That was the last round. Long break, 15 min. |
+| Long break ends | Session complete | 1h 40m focused · 4 of 4 focus blocks |
+
+Durations and rounds come from the session, and a one-round session leaves out the last-round note. The summary is worked out when the notifications are scheduled. Every pause, resume, skip, reset or back schedules them again, so it matches what the session records. Each reschedule replaces every pending notification, because removing only the current session's let reminders from a session that no longer existed fire minutes later. Opening the app clears the delivered ones, since the app then shows where the timer stands. Tapping one opens Focus.
+
+I mark the notifications Time Sensitive because the timer moves on by itself. A reminder that an iOS Focus such as Work holds back means a break that passes without me noticing. iOS needs the Time Sensitive Notifications capability for that, and Apple only offers it to paid developer accounts. I sign the app with a free personal team for now, so iOS delivers them as ordinary notifications. With a paid account, adding the capability in Xcode is the only step left.
+
+I ask for notification permission on the first Start, for alerts and sounds only, since the app shows no badge. At launch, the user hasn't done anything that needs a reminder yet. Permission is read again whenever the app returns to the foreground, since it may have changed in iOS Settings.
 
 ## Focus
 
