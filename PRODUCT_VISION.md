@@ -107,6 +107,8 @@ Liquid color follows the light's path through it. A longer path takes more tint,
 
 The countdown uses Didot Bold, with equal digit widths so it does not shift as time changes. The numerals read as a thin solid inside the vessel. They have a lit upper-left bevel, a faint lower-right rim, a side about two points deep, and a soft shadow on the back wall. The warm graphite face in light mode must maintain at least 3:1 contrast against the glass, with a phase-tinted shadow. Dark mode uses white porcelain over a gray side with a dark shadow. Increase Contrast deepens the light face; the face dims slightly over the last seconds.
 
+FOCUSED, above a finished session's total, uses Didot's small capitals, which only the regular weight has. It is printed flat in one color near the face's middle tone, without the side and shadow, because the stacked side copies striped its hairlines at that size. The SF Expanded Heavy caps it replaced read as a second voice beside the numerals.
+
 Above the surface, the numerals keep that treatment and stay in front of its highlight. Below it, the liquid tints, gently magnifies, and refracts them. Refraction at the waterline is a small kink, never a second digit. The wave and refraction can move while the figures themselves refresh once per second.
 
 The surface moves slowly and stops when paused. During a phase change, the outline, wall, liquid, glow, shadow, and color follow the same transition progress. Otherwise one layer can reach the new shape before its neighbors. The waves keep their motion through the change. The final fill happens during `00:01`; appearing full several seconds early would give the wrong timing cue.

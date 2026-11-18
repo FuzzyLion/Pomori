@@ -160,6 +160,7 @@ private struct BubbleNumeralText<Label: View>: View {
                         .offset(x: depth * Self.sideStep.width, y: depth * Self.sideStep.height)
                 }
             }
+            .environment(\.isBubbleNumeralDepthCopy, true)
             .accessibilityHidden(true)
 
             textLabel
@@ -216,6 +217,16 @@ private struct BubbleNumeralMaterial {
         }
     }
 
+    /// Text printed on the glass rather than cut from the solid, such as FOCUSED: one flat color in
+    /// each appearance, near the face's middle tone. It stays above 5.5:1 on the glass in light mode
+    /// and above 6:1 in dark mode.
+    static func inscription(isDark: Bool, increasedContrast: Bool) -> Color {
+        if isDark {
+            return Color(red: 0.95, green: 0.94, blue: 0.92).opacity(increasedContrast ? 1 : 0.86)
+        }
+        return Color(red: 0.40, green: 0.38, blue: 0.355).mix(with: .black, by: increasedContrast ? 0.3 : 0)
+    }
+
     /// The side's color, from its far edge (0) to the edge beside the face (1).
     func side(nearness: Double) -> Color {
         farSide.mix(with: nearSide, by: nearness)
@@ -243,11 +254,32 @@ private enum BubbleNumerals {
         guard let font = UIFont(name: fontName, size: size) else { return 0 }
         return (font.capHeight - font.ascender - font.descender) / 2
     }
+
+    /// The FOCUSED caption: Didot's own small capitals, which only its regular weight has, so it
+    /// shares the numerals' letterforms at a label's size.
+    static let captionFont: Font = .custom("Didot", fixedSize: 19).lowercaseSmallCaps()
+    static let captionTracking: CGFloat = 2.6
+}
+
+/// Set on the shadow and side copies of the vessel numerals.
+private struct BubbleNumeralDepthCopyKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+private extension EnvironmentValues {
+    var isBubbleNumeralDepthCopy: Bool {
+        get { self[BubbleNumeralDepthCopyKey.self] }
+        set { self[BubbleNumeralDepthCopyKey.self] = newValue }
+    }
 }
 
 /// The focus total in the countdown's numerals, with smaller units, under a small label. The
 /// number sits where the countdown was.
 private struct BubbleSummaryLabel: View {
+    @Environment(\.isBubbleNumeralDepthCopy) private var isDepthCopy
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+
     let summary: BubbleSessionSummary
 
     var body: some View {
@@ -280,11 +312,20 @@ private struct BubbleSummaryLabel: View {
         .fixedSize()
     }
 
+    /// Printed flat on the glass, so the number is the only solid. In the thin-solid treatment the
+    /// side copies striped Didot's hairlines at this size, and the earlier SF Expanded Heavy caps
+    /// read as a second voice beside the Didot numerals.
     private var caption: some View {
-        Text("FOCUSED")
-            .font(.system(size: 12, weight: .heavy, design: .default))
-            .fontWidth(.expanded)
-            .tracking(2.4)
+        Text("focused")
+            .font(BubbleNumerals.captionFont)
+            .tracking(BubbleNumerals.captionTracking)
+            .foregroundStyle(
+                BubbleNumeralMaterial.inscription(
+                    isDark: colorScheme == .dark,
+                    increasedContrast: colorSchemeContrast == .increased
+                )
+            )
+            .opacity(isDepthCopy ? 0 : 1)
     }
 }
 
