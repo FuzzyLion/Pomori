@@ -8,7 +8,7 @@ The session and history data is generated for these previews. The [README](../..
 
 | Detail | Value |
 | --- | --- |
-| App source revision | `59388ad54066` |
+| App source revision | `4cc58ee55c1b` |
 | Build | Debug, `VibePomodoro` iOS scheme |
 | Toolchain | Xcode 27.2, build 27B52 |
 | Device | iPhone 18 Pro |
@@ -24,7 +24,7 @@ The source revision identifies the app code in the captures. Rolling-window labe
 
 ## Focus and breaks
 
-Each phase is paused halfway through its current step. That keeps the liquid and countdown still for comparison. The outline and color change between phases; the baseline and numeral treatment stay the same.
+Each phase is paused halfway through its current step, so the status reads Focus · Paused and so on. That keeps the liquid and countdown still for comparison. The outline and color change between phases; the baseline and numeral treatment stay the same.
 
 | Phase | Light | Dark |
 | --- | :---: | :---: |
@@ -52,7 +52,7 @@ The populated previews use the existing `long-extreme` UI-testing fixture, which
 | :---: | :---: | :---: |
 | <img src="productivity-light.png" alt="Light all-time summary and Week chart with generated history" width="230"> | <img src="productivity-dark.png" alt="Dark all-time summary and Week chart with generated history" width="230"> | <img src="productivity-detail-light.png" alt="Light Productivity page scrolled to the Week chart and recent-session rows" width="230"> |
 
-The overview images start at the top. The detail image is scrolled to Rhythm and Sessions, leaving part of the all-time card above the screen. The native tab bar floats above the content.
+The overview images start at the top, where the whole Rhythm card fits above the tab bar. Its upper right names the window and dates. The detail image is scrolled to Rhythm and Sessions, leaving part of the all-time card above the screen. The native tab bar floats above the content.
 
 ### Ranges and selection
 
