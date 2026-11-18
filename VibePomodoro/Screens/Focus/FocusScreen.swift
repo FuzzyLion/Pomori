@@ -72,6 +72,7 @@ struct FocusScreen: View {
             } message: {
                 Text("This will end the current session and show what you completed.")
             }
+            .alertButtonTint()
         }
         .background {
             VibeBackground()

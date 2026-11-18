@@ -34,10 +34,10 @@ enum VibePalette {
             : ContrastAdaptiveColor(amberGoldInk, increased: amberGoldInkIncreased)
     }
 
-    /// The app tint, which colors the selected tab and the buttons of alerts. The warm accent read at
-    /// about 2.8:1 on the light tab bar, so light mode uses the amber ink (above 5:1 there); dark mode
-    /// keeps the accent, which already reads above 6:1. Controls that should stay warm amber, such as
-    /// the switches, set their own tint.
+    /// The app tint, which colors the selected tab. The warm accent read at about 2.8:1 on the light tab
+    /// bar, so light mode uses the amber ink (above 5:1 there); dark mode keeps the accent, which already
+    /// reads above 6:1. Controls that should stay warm amber, such as the switches, set their own tint,
+    /// and alerts use `alertButtonTint`.
     static func interfaceTint(for colorScheme: ColorScheme, contrast: ColorSchemeContrast) -> Color {
         switch (colorScheme, contrast) {
         case (.dark, .increased): amberGoldInkDark
@@ -45,6 +45,34 @@ enum VibePalette {
         case (_, .increased): amberGoldInkIncreased
         default: amberGoldInk
         }
+    }
+
+    /// Alert buttons sit on glass that shows whatever is behind the alert. Over the amber vessel an amber
+    /// label fell to about 3:1 in light mode and 2:1 in dark mode, so alerts use neutral text instead.
+    static func alertButtonTint(for colorScheme: ColorScheme, contrast: ColorSchemeContrast) -> Color {
+        switch (colorScheme, contrast) {
+        case (.dark, .increased): .white
+        case (.dark, _): warmBackground
+        case (_, .increased): Color(red: 0.12, green: 0.12, blue: 0.14)
+        default: labelPrimary
+        }
+    }
+}
+
+private struct AlertButtonTintModifier: ViewModifier {
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+
+    func body(content: Content) -> some View {
+        content.tint(VibePalette.alertButtonTint(for: colorScheme, contrast: colorSchemeContrast))
+    }
+}
+
+extension View {
+    /// Gives the buttons of an alert presented from this view the neutral alert color. Apply it after
+    /// `.alert`; it also tints the view itself, so use it where the content sets its own colors.
+    func alertButtonTint() -> some View {
+        modifier(AlertButtonTintModifier())
     }
 }
 
