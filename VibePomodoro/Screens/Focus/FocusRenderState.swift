@@ -193,8 +193,10 @@ struct FocusRenderState: Equatable {
 
     /// The completed focus blocks out of the planned ones, and the time spent on breaks.
     static func summaryCaption(for statistics: SessionStatistics, targetRounds: Int) -> String {
-        let rounds = max(1, targetRounds)
-        let blocks = "\(statistics.completedFocusCount) of \(rounds) focus \(rounds == 1 ? "block" : "blocks")"
+        let blocks = FocusCompletionFormatting.focusBlocksText(
+            completed: statistics.completedFocusCount,
+            targetRounds: targetRounds
+        )
         guard statistics.breakTime >= 1 else { return blocks }
         return "\(blocks) · \(FocusCompletionFormatting.durationText(statistics.breakTime)) break"
     }

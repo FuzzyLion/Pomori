@@ -1497,6 +1497,150 @@ struct VibePomodoroTests {
         #expect(plans.allSatisfy { $0.soundName == nil })
     }
 
+    @Test func boundaryNotificationsSayWhatEndedAndWhatStartsNow() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        var settings = PomodoroSettings.default
+        settings.focusMinutes = 25
+        settings.shortBreakMinutes = 5
+        settings.longBreakMinutes = 15
+        settings.targetRounds = 2
+
+        let start = Date(timeIntervalSince1970: 80_000)
+        let store = makeStoreWithRunningSession(settings: settings, start: start, defaults: defaults)
+        let plans = store.notificationPlans(now: start)
+
+        #expect(plans.map(\.title) == ["Focus complete", "Break over", "Focus complete", "Session complete"])
+        #expect(plans.map(\.body) == [
+            "Short break, 5 min.",
+            "Focus round 2 of 2, 25 min.",
+            "That was the last round. Long break, 15 min.",
+            "50m focused · 2 of 2 focus blocks"
+        ])
+        let minutesUntilEachBoundary: [TimeInterval] = [25, 30, 55, 70]
+        #expect(plans.map(\.timeInterval) == minutesUntilEachBoundary.map { $0 * 60 })
+    }
+
+    @Test func oneRoundNotificationsLeaveOutTheLastRoundNote() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        var settings = PomodoroSettings.default
+        settings.targetRounds = 1
+
+        let start = Date(timeIntervalSince1970: 85_000)
+        let store = makeStoreWithRunningSession(settings: settings, start: start, defaults: defaults)
+        let plans = store.notificationPlans(now: start)
+
+        #expect(plans.map(\.title) == ["Focus complete", "Session complete"])
+        #expect(plans.map(\.body) == ["Long break, 15 min.", "25m focused · 1 of 1 focus block"])
+    }
+
+    @Test func sessionCompleteNotificationCountsOnlyFullFocusBlocks() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        var settings = PomodoroSettings.default
+        settings.targetRounds = 2
+
+        let start = Date(timeIntervalSince1970: 90_000)
+        let store = makeStoreWithRunningSession(settings: settings, start: start, defaults: defaults)
+        var session = try #require(store.activeSession)
+        let skipTime = start.addingTimeInterval(5 * 60)
+        _ = PomodoroEngine.skip(session: &session, now: skipTime)
+        store.activeSession = session
+
+        let plans = store.notificationPlans(now: skipTime)
+
+        // Five skipped minutes stay in the focus total, but that block isn't completed.
+        #expect(plans.map(\.title) == ["Break over", "Focus complete", "Session complete"])
+        #expect(plans.last?.body == "30m focused · 1 of 2 focus blocks")
+    }
+
+    @Test func remindersAreTimeSensitiveAndReplaceEveryPendingOne() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        var settings = PomodoroSettings.default
+        settings.targetRounds = 1
+
+        let scheduler = RecordingNotificationScheduler()
+        let store = makeStoreWithRunningSession(
+            settings: settings,
+            start: Date(),
+            defaults: defaults,
+            notificationScheduler: scheduler
+        )
+
+        store.syncNotifications()
+
+        #expect(scheduler.pendingRequests.map(\.content.title) == ["Focus complete", "Session complete"])
+        #expect(scheduler.pendingRequests.allSatisfy { $0.content.interruptionLevel == .timeSensitive })
+        #expect(scheduler.pendingRequests.allSatisfy { $0.content.sound != nil })
+        let trigger = try #require(scheduler.pendingRequests.first?.trigger as? UNTimeIntervalNotificationTrigger)
+        #expect(abs(trigger.timeInterval - 25 * 60) < 2)
+
+        store.togglePrimaryAction()
+
+        #expect(store.activeSession?.runState == .paused)
+        #expect(scheduler.pendingRequests.isEmpty)
+    }
+
+    @Test func openingTheAppClearsDeliveredReminders() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        let scheduler = RecordingNotificationScheduler()
+        let store = PomodoroStore(
+            defaults: defaults,
+            feedbackPlayer: RecordingReminderFeedbackPlayer(),
+            notificationScheduler: scheduler
+        )
+
+        #expect(scheduler.attachCount == 1)
+        #expect(scheduler.deliveredRemovalCount == 1)
+
+        store.handleScenePhaseChange(.background)
+        #expect(scheduler.deliveredRemovalCount == 1)
+
+        store.handleScenePhaseChange(.active)
+        #expect(scheduler.deliveredRemovalCount == 2)
+    }
+
+    @Test func remindersShowInTheAppOnlyWhileItIsNotActive() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        let store = PomodoroStore(
+            defaults: defaults,
+            feedbackPlayer: RecordingReminderFeedbackPlayer(),
+            notificationScheduler: RecordingNotificationScheduler()
+        )
+
+        store.handleScenePhaseChange(.active)
+        #expect(store.notificationPresentationOptions == [])
+
+        store.handleScenePhaseChange(.inactive)
+        #expect(store.notificationPresentationOptions == [.banner, .list, .sound])
+    }
+
+    @Test func openingAReminderShowsFocus() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        let store = PomodoroStore(
+            defaults: defaults,
+            feedbackPlayer: RecordingReminderFeedbackPlayer(),
+            notificationScheduler: RecordingNotificationScheduler()
+        )
+        store.selectedTab = .settings
+
+        store.showFocusForOpenedNotification()
+
+        #expect(store.selectedTab == .focus)
+    }
+
     @Test func foregroundBoundaryFeedbackUsesForwardWhooshOnly() async throws {
         let actions = ReminderFeedbackPlan.actions(
             for: [
@@ -1862,9 +2006,15 @@ struct VibePomodoroTests {
         settings: PomodoroSettings,
         start: Date,
         defaults: UserDefaults,
-        feedbackPlayer: ReminderFeedbackPlaying? = nil
+        feedbackPlayer: ReminderFeedbackPlaying? = nil,
+        notificationScheduler: ReminderNotificationScheduling? = nil
     ) -> PomodoroStore {
-        let store = PomodoroStore(defaults: defaults, feedbackPlayer: feedbackPlayer ?? RecordingReminderFeedbackPlayer())
+        let store = PomodoroStore(
+            defaults: defaults,
+            feedbackPlayer: feedbackPlayer ?? RecordingReminderFeedbackPlayer(),
+            // Recording keeps test sessions from scheduling real reminders on the simulator.
+            notificationScheduler: notificationScheduler ?? RecordingNotificationScheduler()
+        )
         store.settings = settings
 
         var session = SessionSnapshot.makeNew(settings: settings, now: start)
@@ -1879,6 +2029,24 @@ struct VibePomodoroTests {
 
         func play(_ actions: [ReminderFeedbackAction]) {
             playedActionBatches.append(actions)
+        }
+    }
+
+    private final class RecordingNotificationScheduler: ReminderNotificationScheduling {
+        private(set) var attachCount = 0
+        private(set) var pendingRequests: [UNNotificationRequest] = []
+        private(set) var deliveredRemovalCount = 0
+
+        func attach(to store: PomodoroStore) {
+            attachCount += 1
+        }
+
+        func replacePendingRequests(with requests: [UNNotificationRequest]) {
+            pendingRequests = requests
+        }
+
+        func removeDeliveredNotifications() {
+            deliveredRemovalCount += 1
         }
     }
 

@@ -1,7 +1,13 @@
 import Foundation
+import SwiftUI
 import UserNotifications
 
 struct PomodoroNotificationPlan: Equatable {
+    /// A timer reminder matters the moment it arrives, so it may break through a Focus and the
+    /// scheduled summary. That takes the Time Sensitive Notifications capability, which only a paid
+    /// developer team can sign. Without it iOS delivers the reminders as ordinary notifications.
+    static let interruptionLevel: UNNotificationInterruptionLevel = .timeSensitive
+
     let identifier: String
     let title: String
     let body: String
@@ -10,6 +16,53 @@ struct PomodoroNotificationPlan: Equatable {
 
     var soundName: String? {
         soundResource?.notificationSoundName
+    }
+
+    var request: UNNotificationRequest {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.interruptionLevel = Self.interruptionLevel
+        if let soundName {
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
+        }
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
+        return UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+    }
+}
+
+/// What a reminder says.
+struct PomodoroNotificationMessage: Equatable {
+    let title: String
+    let body: String
+
+    /// One step ended and the next has already started: what ended, then what runs now and for how long.
+    static func boundary(ending step: SessionStep, starting next: SessionStep, targetRounds: Int) -> Self {
+        let title = step.phase == .focus ? "Focus complete" : "Break over"
+        let duration = "\(Int((next.plannedDuration / 60).rounded())) min"
+
+        switch next.phase {
+        case .focus:
+            return Self(title: title, body: "Focus round \(next.roundNumber) of \(targetRounds), \(duration).")
+        case .shortBreak:
+            return Self(title: title, body: "Short break, \(duration).")
+        case .longBreak:
+            // The long break follows the final round. A one-round session has no earlier round to
+            // set the last one apart from.
+            let lastRoundNote = targetRounds > 1 ? "That was the last round. " : ""
+            return Self(title: title, body: "\(lastRoundNote)Long break, \(duration).")
+        }
+    }
+
+    /// The whole session ended. The figures read like the summary the app shows.
+    static func sessionComplete(_ statistics: SessionStatistics, targetRounds: Int) -> Self {
+        let focus = FocusCompletionFormatting.durationText(statistics.focusTime)
+        let blocks = FocusCompletionFormatting.focusBlocksText(
+            completed: statistics.completedFocusCount,
+            targetRounds: targetRounds
+        )
+        return Self(title: "Session complete", body: "\(focus) focused · \(blocks)")
     }
 }
 
@@ -39,7 +92,8 @@ extension PomodoroStore {
         }
 
         Task {
-            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])
+            // The app shows no badge, so it doesn't ask for one.
+            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
             await updateNotificationPermission()
             // Reminders for a session that started before the answer.
             syncNotifications()
@@ -69,29 +123,27 @@ extension PomodoroStore {
         }
     }
 
+    /// Replaces every pending reminder with the ones the session needs now.
     func syncNotifications() {
-        let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: pendingNotificationIdentifiers())
+        notificationScheduler.replacePendingRequests(with: notificationPlans(now: .now).map(\.request))
+    }
 
-        let plans = notificationPlans(now: .now)
+    /// Once the app is open it shows where the timer stands, so reminders already delivered are out
+    /// of date.
+    func clearDeliveredNotifications() {
+        notificationScheduler.removeDeliveredNotifications()
+    }
 
-        for plan in plans {
-            let content = UNMutableNotificationContent()
-            content.title = plan.title
-            content.body = plan.body
-            if let soundName = plan.soundName {
-                content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundName))
-            }
+    /// While the app is open and active, its own sound and haptic mark a boundary, so a reminder that
+    /// arrives then stays hidden. Behind Control Center or the app switcher the app gives no response
+    /// of its own, so the reminder shows as it would in the background.
+    var notificationPresentationOptions: UNNotificationPresentationOptions {
+        currentScenePhase == .active ? [] : [.banner, .list, .sound]
+    }
 
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: plan.timeInterval, repeats: false)
-            let request = UNNotificationRequest(
-                identifier: plan.identifier,
-                content: content,
-                trigger: trigger
-            )
-
-            center.add(request, withCompletionHandler: nil)
-        }
+    /// Every reminder is about the timer, so opening one shows Focus.
+    func showFocusForOpenedNotification() {
+        selectedTab = .focus
     }
 
     func notificationPlans(now: Date = .now) -> [PomodoroNotificationPlan] {
@@ -115,29 +167,25 @@ extension PomodoroStore {
             let nextStepIndex = index + 1
             let nextStep = session.steps.indices.contains(nextStepIndex) ? session.steps[nextStepIndex] : nil
 
-            let title: String
-            let body: String
+            let message: PomodoroNotificationMessage
+            let soundResource: ReminderSoundResource
             if let nextStep {
-                title = "\(step.phase.title) complete"
-                body = "\(nextStep.phase.title) begins now."
+                message = .boundary(ending: step, starting: nextStep, targetRounds: session.targetRounds)
+                soundResource = .nextPhaseWhoosh
             } else {
-                title = "\(step.phase.title) complete"
-                body = "Session complete. Take a breath."
-            }
-
-            let soundResource: ReminderSoundResource?
-            if settings.soundEnabled {
-                soundResource = nextStep == nil ? .sessionCompleteThud : .nextPhaseWhoosh
-            } else {
-                soundResource = nil
+                message = .sessionComplete(
+                    Self.projectedStatistics(of: session, endingAt: boundaryDate),
+                    targetRounds: session.targetRounds
+                )
+                soundResource = .sessionCompleteThud
             }
 
             plans.append(PomodoroNotificationPlan(
                 identifier: notificationIdentifier(for: session.id, stepIndex: index),
-                title: title,
-                body: body,
+                title: message.title,
+                body: message.body,
                 timeInterval: max(1, boundaryDate.timeIntervalSince(now)),
-                soundResource: soundResource
+                soundResource: settings.soundEnabled ? soundResource : nil
             ))
         }
 
@@ -146,12 +194,16 @@ extension PomodoroStore {
 }
 
 private extension PomodoroStore {
-    func pendingNotificationIdentifiers() -> [String] {
-        guard let session = activeSession else { return [] }
-        return (0..<session.steps.count).map { notificationIdentifier(for: session.id, stepIndex: $0) }
-    }
-
     func notificationIdentifier(for sessionID: UUID, stepIndex: Int) -> String {
         "vibe.\(sessionID.uuidString).\(stepIndex)"
+    }
+
+    /// What the session will have recorded if it runs to its end unchanged. Any change reschedules
+    /// the reminders, so the summary in the last one stays true. It runs the engine rather than adding
+    /// up durations, so it counts blocks the way the app's summary does.
+    static func projectedStatistics(of session: SessionSnapshot, endingAt endDate: Date) -> SessionStatistics {
+        var projected = session
+        _ = PomodoroEngine.reconcile(session: &projected, now: endDate)
+        return projected.statistics(now: endDate)
     }
 }
