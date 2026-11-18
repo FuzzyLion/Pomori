@@ -358,6 +358,7 @@ private struct SettingsSystemSettingsRow: View {
 
 private struct SettingsToggleRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
 
     @Binding var isOn: Bool
 
@@ -381,7 +382,7 @@ private struct SettingsToggleRow: View {
             }
             .padding(.vertical, SettingsLayout.rowVerticalPadding)
         }
-        .tint(VibePalette.focusTint)
+        .tint(SettingsTheme.switchTint(for: colorScheme, contrast: colorSchemeContrast))
         .accessibilityIdentifier(title)
     }
 }

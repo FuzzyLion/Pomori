@@ -40,8 +40,7 @@ enum VibePalette {
 
     /// The app tint, which colors the selected tab. The warm accent read at about 2.8:1 on the light tab
     /// bar, so light mode uses the amber ink (above 5:1 there); dark mode keeps the accent, which already
-    /// reads above 6:1. Controls that should stay warm amber, such as the switches, set their own tint,
-    /// and alerts use `alertButtonTint`.
+    /// reads above 6:1. Switches set their own neutral tint, and alerts use `alertButtonTint`.
     static func interfaceTint(for colorScheme: ColorScheme, contrast: ColorSchemeContrast) -> Color {
         switch (colorScheme, contrast) {
         case (.dark, .increased): amberGoldInkDark
