@@ -259,6 +259,7 @@ struct FocusIconButton: View {
 
 struct FocusPrimaryControlButton: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let action: FocusPrimaryAction
     let phase: SessionPhase
@@ -267,8 +268,9 @@ struct FocusPrimaryControlButton: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 9) {
-                // When the label changes inside an animation, as Pause becomes Done at a session's
-                // end, the symbol and the title change over together.
+                // The symbol animates the change and the label slides to its new center. The title
+                // itself switches at once: inside the glass button an animated title change drew the
+                // old and the new word on top of each other at full strength until the animation ended.
                 Image(systemName: action.systemImage)
                     .focusFont(.primarySymbol)
                     .contentTransition(.symbolEffect(.replace))
@@ -278,7 +280,7 @@ struct FocusPrimaryControlButton: View {
                     .tracking(-0.18)
                     .lineLimit(1)
                     .minimumScaleFactor(0.88)
-                    .contentTransition(.opacity)
+                    .contentTransition(.identity)
             }
             .foregroundStyle(colorScheme == .light ? FocusControlColors.lightProminentButtonForeground : .primary)
             .frame(
@@ -290,6 +292,13 @@ struct FocusPrimaryControlButton: View {
         }
         .buttonStyle(.glassProminent)
         .tint(FocusControlColors.primaryButtonTint(for: action, phase: phase, colorScheme: colorScheme))
+        // Every change of action moves the same way, timed like Paused in the status line. A tap used
+        // to arrive with an animation only some of the time: then the label slid to its new center and
+        // the tint faded, otherwise the title and the tint jumped while the symbol still animated.
+        .animation(
+            reduceMotion ? FocusCompletionMotion.reducedMotionFade : FocusScreenLayout.pausedStatusAnimation,
+            value: action
+        )
         .buttonBorderShape(.capsule)
         .accessibilityLabel(action.title)
         // The label stops growing at the page's largest text size; beyond it a long press shows it enlarged.
