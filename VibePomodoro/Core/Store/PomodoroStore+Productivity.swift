@@ -47,7 +47,7 @@ extension PomodoroStore {
         streakLength(from: productivityCache.dailySummaries, now: now)
     }
 
-    func averageFocusHoursPerDay(now: Date = .now) -> Double {
+    func averageFocusHoursPerDay(now: Date = .now) -> Double? {
         productivityCache.averageFocusHoursPerDay
     }
 }
@@ -192,7 +192,8 @@ struct ProductivityMetricsSnapshot: Equatable {
     let completedFocusCount: Int
     let totalFocusTime: TimeInterval
     let totalBreakTime: TimeInterval
-    let averageFocusHoursPerDay: Double
+    /// Nil until a day has recorded focus.
+    let averageFocusHoursPerDay: Double?
 
     var totalSessionTime: TimeInterval {
         totalFocusTime + totalBreakTime

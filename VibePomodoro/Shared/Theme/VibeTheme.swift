@@ -3,6 +3,10 @@ import SwiftUI
 enum VibePalette {
     static let amberGold = Color(red: 0.85, green: 0.70, blue: 0.40)
     static let amberGoldDeep = Color(red: 0.76, green: 0.58, blue: 0.25)
+    /// Amber Gold after light has crossed some of the liquid: each channel squared, scaled back to the
+    /// brightest. The dark Focus liquid lights its top with it, and the dark Focus button uses it
+    /// because Amber Gold at that opacity mixed with the glass to khaki.
+    static let amberGoldRich = Color(red: 0.85, green: 0.576, blue: 0.188)
     static let warmAmberAccent = Color(red: 0.70, green: 0.55, blue: 0.31)
     static let warmAmberAccentDeep = Color(red: 0.58, green: 0.44, blue: 0.24)
     static let softMist = Color(red: 0.71, green: 0.82, blue: 0.90)
@@ -36,8 +40,7 @@ enum VibePalette {
 
     /// The app tint, which colors the selected tab. The warm accent read at about 2.8:1 on the light tab
     /// bar, so light mode uses the amber ink (above 5:1 there); dark mode keeps the accent, which already
-    /// reads above 6:1. Controls that should stay warm amber, such as the switches, set their own tint,
-    /// and alerts use `alertButtonTint`.
+    /// reads above 6:1. Switches set their own neutral tint, and alerts use `alertButtonTint`.
     static func interfaceTint(for colorScheme: ColorScheme, contrast: ColorSchemeContrast) -> Color {
         switch (colorScheme, contrast) {
         case (.dark, .increased): amberGoldInkDark

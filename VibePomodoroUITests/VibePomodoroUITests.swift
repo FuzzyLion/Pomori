@@ -104,6 +104,7 @@ final class VibePomodoroUITests: XCTestCase {
 
         XCTAssertTrue(app.navigationBars["Productivity"].waitForExistence(timeout: 8), app.debugDescription)
         XCTAssertTrue(app.staticTexts["No finished sessions yet"].exists)
+        XCTAssertEqual(app.otherElements["Daily Focus Avg"].value as? String, "No days with focus yet", app.debugDescription)
         XCTAssertTrue(app.staticTexts["Sessions appear here once they end, including ones you finish early. A session in progress isn't counted until then."].exists)
         XCTAssertTrue(app.staticTexts["Rhythm"].exists)
         XCTAssertFalse(app.staticTexts["Sessions"].exists)
@@ -261,6 +262,7 @@ final class VibePomodoroUITests: XCTestCase {
         let appearanceMenu = app.buttons["settings.appearance"]
         XCTAssertTrue(appearanceMenu.waitForExistence(timeout: 2), app.debugDescription)
         XCTAssertTrue(app.switches["Keep Screen On"].exists || app.buttons["Keep Screen On"].exists)
+        XCTAssertTrue(element(in: app, containing: "Only while the timer is running").exists, app.debugDescription)
         XCTAssertTrue(app.staticTexts["Follow System"].exists)
 
         scrollUntilHittable(appearanceMenu, in: app)

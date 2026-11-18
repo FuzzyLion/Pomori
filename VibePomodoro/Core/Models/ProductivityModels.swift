@@ -71,9 +71,11 @@ struct ProductivityAggregateCache: Codable, Equatable {
         totalShortBreakTime + totalLongBreakTime
     }
 
-    var averageFocusHoursPerDay: Double {
+    /// Nil until a day has recorded focus. An average over no days has no value, and showing 0 would
+    /// read as a measured result.
+    var averageFocusHoursPerDay: Double? {
         let focusDays = dailySummaries.filter { $0.focusTime > 0 }
-        guard !focusDays.isEmpty else { return 0 }
+        guard !focusDays.isEmpty else { return nil }
 
         let total = focusDays.reduce(0) { $0 + $1.focusTime }
         return total / Double(focusDays.count) / 3600

@@ -83,6 +83,7 @@ struct SettingsAlertsSection: View {
 
 struct SettingsDisplaySection: View {
     @EnvironmentObject private var store: PomodoroStore
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: SettingsLayout.sectionHeaderBottomSpacing) {
@@ -103,7 +104,9 @@ struct SettingsDisplaySection: View {
                     SettingsToggleRow(
                         isOn: keepScreenOnBinding,
                         title: "Keep Screen On",
-                        subtitle: "Active sessions only"
+                        // A paused session is still active, but only a running one keeps the
+                        // screen on.
+                        subtitle: "Only while the timer is running"
                     )
                 }
             }
@@ -141,6 +144,11 @@ struct SettingsDisplaySection: View {
             .accessibilityValue(store.settings.appearanceMode.title)
             .accessibilityHint("Opens appearance mode choices.")
             .accessibilityIdentifier("settings.appearance")
+            // While the menu closes, iOS hides this button behind a stand-in that keeps the glass of
+            // the appearance it was made in. After a choice that switches Light and Dark, the old
+            // glass sat on the row for about 0.7 s and then snapped. A new button for each
+            // appearance removes the stand-in at once; choices that keep the appearance still morph.
+            .id(colorScheme)
         }
     }
 
@@ -358,6 +366,7 @@ private struct SettingsSystemSettingsRow: View {
 
 private struct SettingsToggleRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
 
     @Binding var isOn: Bool
 
@@ -381,7 +390,7 @@ private struct SettingsToggleRow: View {
             }
             .padding(.vertical, SettingsLayout.rowVerticalPadding)
         }
-        .tint(VibePalette.focusTint)
+        .tint(SettingsTheme.switchTint(for: colorScheme, contrast: colorSchemeContrast))
         .accessibilityIdentifier(title)
     }
 }

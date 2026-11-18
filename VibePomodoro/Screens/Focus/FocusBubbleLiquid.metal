@@ -78,6 +78,7 @@ float squared(float x) {
 // bounds:    the inside of the glass: top, bottom, left, right
 // sections:  (left, right) pairs on rows from its top to its bottom, then as many (top, bottom)
 //            pairs on columns from its left to its right
+// lift:      light just below the surface, 0 for none
 [[ stitchable ]] half4 bubbleLiquid(
     float2 position,
     SwiftUI::Layer layer,
@@ -92,7 +93,8 @@ float squared(float x) {
     float cue,
     float4 bounds,
     device const float *sections,
-    int sectionCount
+    int sectionCount,
+    float lift
 ) {
     float2 q = position;
     float4 dry = float4(layer.sample(q));
@@ -168,6 +170,14 @@ float squared(float x) {
         * smoothstep(-0.1, 0.85, u)
         * smoothstep(0.30, 0.85, q.y / size.y);
     light += glow * rim * (dark ? 0.30 : 0.35);
+
+    // Light that enters through the surface scatters a short way down before the liquid absorbs
+    // it, so the top of the liquid stays lit. It has already crossed some liquid, which leaves it
+    // a richer tint than the glow: each channel squared, scaled back to the brightest.
+    if (lift > 0.0) {
+        float3 rich = tint * tint / max(max(tint.r, tint.g), max(tint.b, 0.05));
+        light += rich * exp(-depthBelow / 40.0) * lift;
+    }
 
     if (look.w > 0.0) {
         float t = waveState.w;

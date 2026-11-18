@@ -26,6 +26,20 @@ enum FocusControlColors {
     static var lightProminentButtonForeground: Color {
         VibePalette.labelPrimary.opacity(0.92)
     }
+
+    /// Pause stays neutral so the bubble remains the strongest color while a step runs. Start,
+    /// Resume, and Done carry a light wash of the current phase color. In dark mode Amber Gold at
+    /// that opacity mixed with the glass to khaki, so Focus takes the richer amber, which is about
+    /// as light and keeps the white label near 5.5:1.
+    static func primaryButtonTint(for action: FocusPrimaryAction, phase: SessionPhase, colorScheme: ColorScheme) -> Color {
+        if action == .pause {
+            return Color.white.opacity(colorScheme == .dark ? 0.10 : 0.70)
+        }
+        if colorScheme == .dark, phase == .focus {
+            return VibePalette.amberGoldRich.opacity(0.40)
+        }
+        return phase.tintColor.opacity(colorScheme == .dark ? 0.34 : 0.42)
+    }
 }
 
 struct FocusStatusTitle: View {
@@ -245,6 +259,7 @@ struct FocusIconButton: View {
 
 struct FocusPrimaryControlButton: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let action: FocusPrimaryAction
     let phase: SessionPhase
@@ -253,8 +268,9 @@ struct FocusPrimaryControlButton: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 9) {
-                // When the label changes inside an animation, as Pause becomes Done at a session's
-                // end, the symbol and the title change over together.
+                // The symbol animates the change and the label slides to its new center. The title
+                // itself switches at once: inside the glass button an animated title change drew the
+                // old and the new word on top of each other at full strength until the animation ended.
                 Image(systemName: action.systemImage)
                     .focusFont(.primarySymbol)
                     .contentTransition(.symbolEffect(.replace))
@@ -264,7 +280,7 @@ struct FocusPrimaryControlButton: View {
                     .tracking(-0.18)
                     .lineLimit(1)
                     .minimumScaleFactor(0.88)
-                    .contentTransition(.opacity)
+                    .contentTransition(.identity)
             }
             .foregroundStyle(colorScheme == .light ? FocusControlColors.lightProminentButtonForeground : .primary)
             .frame(
@@ -275,7 +291,14 @@ struct FocusPrimaryControlButton: View {
             )
         }
         .buttonStyle(.glassProminent)
-        .tint(tint)
+        .tint(FocusControlColors.primaryButtonTint(for: action, phase: phase, colorScheme: colorScheme))
+        // Every change of action moves the same way, timed like Paused in the status line. A tap used
+        // to arrive with an animation only some of the time: then the label slid to its new center and
+        // the tint faded, otherwise the title and the tint jumped while the symbol still animated.
+        .animation(
+            reduceMotion ? FocusCompletionMotion.reducedMotionFade : FocusScreenLayout.pausedStatusAnimation,
+            value: action
+        )
         .buttonBorderShape(.capsule)
         .accessibilityLabel(action.title)
         // The label stops growing at the page's largest text size; beyond it a long press shows it enlarged.
@@ -283,15 +306,5 @@ struct FocusPrimaryControlButton: View {
             Label(action.title, systemImage: action.systemImage)
         }
         .zIndex(4)
-    }
-
-    /// Pause stays neutral so the bubble remains the strongest color while a step runs.
-    /// Start, Resume, and Done carry a light wash of the current phase color.
-    private var tint: Color {
-        if action == .pause {
-            return Color.white.opacity(colorScheme == .dark ? 0.10 : 0.70)
-        }
-
-        return phase.tintColor.opacity(colorScheme == .dark ? 0.34 : 0.42)
     }
 }

@@ -73,6 +73,18 @@ enum SettingsTheme {
         VibePalette.amberText(for: colorScheme)
     }
 
+    /// Switches are neutral gray. Amber marks focus on this page, and four amber switches were the
+    /// brightest thing on it. In light mode the gray also shows a switch is on more clearly, about
+    /// 3.8:1 against the card where amber reached about 2:1.
+    static func switchTint(for colorScheme: ColorScheme, contrast: ColorSchemeContrast) -> Color {
+        switch (colorScheme, contrast) {
+        case (.dark, .increased): Color(red: 0.82, green: 0.80, blue: 0.77)
+        case (.dark, _): Color(red: 0.70, green: 0.68, blue: 0.65)
+        case (_, .increased): Color(red: 0.27, green: 0.26, blue: 0.25)
+        default: Color(red: 0.52, green: 0.51, blue: 0.49)
+        }
+    }
+
     /// Clear Productivity History. Softer than system red in dark mode, which stays near 3:1 on the
     /// dark cards.
     static func destructiveTextColor(for colorScheme: ColorScheme) -> ContrastAdaptiveColor {
