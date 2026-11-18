@@ -1497,6 +1497,67 @@ struct VibePomodoroTests {
         #expect(plans.allSatisfy { $0.soundName == nil })
     }
 
+    @Test func boundaryNotificationsSayWhatEndedAndWhatStartsNow() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        var settings = PomodoroSettings.default
+        settings.focusMinutes = 25
+        settings.shortBreakMinutes = 5
+        settings.longBreakMinutes = 15
+        settings.targetRounds = 2
+
+        let start = Date(timeIntervalSince1970: 80_000)
+        let store = makeStoreWithRunningSession(settings: settings, start: start, defaults: defaults)
+        let plans = store.notificationPlans(now: start)
+
+        #expect(plans.map(\.title) == ["Focus complete", "Break over", "Focus complete", "Session complete"])
+        #expect(plans.map(\.body) == [
+            "Short break, 5 min.",
+            "Focus round 2 of 2, 25 min.",
+            "That was the last round. Long break, 15 min.",
+            "50m focused · 2 of 2 focus blocks"
+        ])
+        let minutesUntilEachBoundary: [TimeInterval] = [25, 30, 55, 70]
+        #expect(plans.map(\.timeInterval) == minutesUntilEachBoundary.map { $0 * 60 })
+    }
+
+    @Test func oneRoundNotificationsLeaveOutTheLastRoundNote() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        var settings = PomodoroSettings.default
+        settings.targetRounds = 1
+
+        let start = Date(timeIntervalSince1970: 85_000)
+        let store = makeStoreWithRunningSession(settings: settings, start: start, defaults: defaults)
+        let plans = store.notificationPlans(now: start)
+
+        #expect(plans.map(\.title) == ["Focus complete", "Session complete"])
+        #expect(plans.map(\.body) == ["Long break, 15 min.", "25m focused · 1 of 1 focus block"])
+    }
+
+    @Test func sessionCompleteNotificationCountsOnlyFullFocusBlocks() async throws {
+        let (defaults, suiteName) = makeDefaults()
+        defer { clear(defaults, suiteName: suiteName) }
+
+        var settings = PomodoroSettings.default
+        settings.targetRounds = 2
+
+        let start = Date(timeIntervalSince1970: 90_000)
+        let store = makeStoreWithRunningSession(settings: settings, start: start, defaults: defaults)
+        var session = try #require(store.activeSession)
+        let skipTime = start.addingTimeInterval(5 * 60)
+        _ = PomodoroEngine.skip(session: &session, now: skipTime)
+        store.activeSession = session
+
+        let plans = store.notificationPlans(now: skipTime)
+
+        // Five skipped minutes stay in the focus total, but that block isn't completed.
+        #expect(plans.map(\.title) == ["Break over", "Focus complete", "Session complete"])
+        #expect(plans.last?.body == "30m focused · 1 of 2 focus blocks")
+    }
+
     @Test func foregroundBoundaryFeedbackUsesForwardWhooshOnly() async throws {
         let actions = ReminderFeedbackPlan.actions(
             for: [

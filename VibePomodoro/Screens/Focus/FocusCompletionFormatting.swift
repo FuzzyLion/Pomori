@@ -31,6 +31,13 @@ enum FocusCompletionFormatting {
         return [DurationPart(value: "\(seconds)", unit: "s")]
     }
 
+    /// The completed focus blocks out of the planned ones, such as 3 of 4 focus blocks. The summary
+    /// and the session-complete notification both use it, so they read the same.
+    static func focusBlocksText(completed: Int, targetRounds: Int) -> String {
+        let rounds = max(1, targetRounds)
+        return "\(completed) of \(rounds) focus \(rounds == 1 ? "block" : "blocks")"
+    }
+
     static func accessibilityDurationText(_ duration: TimeInterval) -> String {
         let totalSeconds = max(0, Int(duration.rounded()))
         let hours = totalSeconds / 3600

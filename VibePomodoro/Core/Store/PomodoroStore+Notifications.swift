@@ -13,6 +13,40 @@ struct PomodoroNotificationPlan: Equatable {
     }
 }
 
+/// What a reminder says.
+struct PomodoroNotificationMessage: Equatable {
+    let title: String
+    let body: String
+
+    /// One step ended and the next has already started: what ended, then what runs now and for how long.
+    static func boundary(ending step: SessionStep, starting next: SessionStep, targetRounds: Int) -> Self {
+        let title = step.phase == .focus ? "Focus complete" : "Break over"
+        let duration = "\(Int((next.plannedDuration / 60).rounded())) min"
+
+        switch next.phase {
+        case .focus:
+            return Self(title: title, body: "Focus round \(next.roundNumber) of \(targetRounds), \(duration).")
+        case .shortBreak:
+            return Self(title: title, body: "Short break, \(duration).")
+        case .longBreak:
+            // The long break follows the final round. A one-round session has no earlier round to
+            // set the last one apart from.
+            let lastRoundNote = targetRounds > 1 ? "That was the last round. " : ""
+            return Self(title: title, body: "\(lastRoundNote)Long break, \(duration).")
+        }
+    }
+
+    /// The whole session ended. The figures read like the summary the app shows.
+    static func sessionComplete(_ statistics: SessionStatistics, targetRounds: Int) -> Self {
+        let focus = FocusCompletionFormatting.durationText(statistics.focusTime)
+        let blocks = FocusCompletionFormatting.focusBlocksText(
+            completed: statistics.completedFocusCount,
+            targetRounds: targetRounds
+        )
+        return Self(title: "Session complete", body: "\(focus) focused · \(blocks)")
+    }
+}
+
 extension NotificationPermission {
     init(_ status: UNAuthorizationStatus) {
         switch status {
@@ -115,29 +149,25 @@ extension PomodoroStore {
             let nextStepIndex = index + 1
             let nextStep = session.steps.indices.contains(nextStepIndex) ? session.steps[nextStepIndex] : nil
 
-            let title: String
-            let body: String
+            let message: PomodoroNotificationMessage
+            let soundResource: ReminderSoundResource
             if let nextStep {
-                title = "\(step.phase.title) complete"
-                body = "\(nextStep.phase.title) begins now."
+                message = .boundary(ending: step, starting: nextStep, targetRounds: session.targetRounds)
+                soundResource = .nextPhaseWhoosh
             } else {
-                title = "\(step.phase.title) complete"
-                body = "Session complete. Take a breath."
-            }
-
-            let soundResource: ReminderSoundResource?
-            if settings.soundEnabled {
-                soundResource = nextStep == nil ? .sessionCompleteThud : .nextPhaseWhoosh
-            } else {
-                soundResource = nil
+                message = .sessionComplete(
+                    Self.projectedStatistics(of: session, endingAt: boundaryDate),
+                    targetRounds: session.targetRounds
+                )
+                soundResource = .sessionCompleteThud
             }
 
             plans.append(PomodoroNotificationPlan(
                 identifier: notificationIdentifier(for: session.id, stepIndex: index),
-                title: title,
-                body: body,
+                title: message.title,
+                body: message.body,
                 timeInterval: max(1, boundaryDate.timeIntervalSince(now)),
-                soundResource: soundResource
+                soundResource: settings.soundEnabled ? soundResource : nil
             ))
         }
 
@@ -153,5 +183,14 @@ private extension PomodoroStore {
 
     func notificationIdentifier(for sessionID: UUID, stepIndex: Int) -> String {
         "vibe.\(sessionID.uuidString).\(stepIndex)"
+    }
+
+    /// What the session will have recorded if it runs to its end unchanged. Any change reschedules
+    /// the reminders, so the summary in the last one stays true. It runs the engine rather than adding
+    /// up durations, so it counts blocks the way the app's summary does.
+    static func projectedStatistics(of session: SessionSnapshot, endingAt endDate: Date) -> SessionStatistics {
+        var projected = session
+        _ = PomodoroEngine.reconcile(session: &projected, now: endDate)
+        return projected.statistics(now: endDate)
     }
 }
