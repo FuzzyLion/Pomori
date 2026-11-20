@@ -99,13 +99,13 @@ xcodebuild \
   -scheme VibePomodoro \
   -configuration Debug \
   -destination "platform=iOS Simulator,id=$DEVICE_ID" \
-  -derivedDataPath /tmp/VibePomodoro-docs-build \
+  -derivedDataPath /tmp/Pomori-docs-build \
   build CODE_SIGNING_ALLOWED=NO
 
 xcrun simctl boot "$DEVICE_ID"
 xcrun simctl bootstatus "$DEVICE_ID" -b
 xcrun simctl install "$DEVICE_ID" \
-  /tmp/VibePomodoro-docs-build/Build/Products/Debug-iphonesimulator/VibePomodoro.app
+  /tmp/Pomori-docs-build/Build/Products/Debug-iphonesimulator/VibePomodoro.app
 
 xcrun simctl status_bar "$DEVICE_ID" override \
   --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 \

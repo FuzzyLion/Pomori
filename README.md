@@ -1,6 +1,6 @@
-# VibePomodoro
+# Pomori
 
-I'm building VibePomodoro, a native iOS Pomodoro timer in SwiftUI. It handles focus and break cycles, restores an unfinished session after relaunch, and records completed sessions in local productivity charts.
+I'm building Pomori, a native iOS Pomodoro timer in SwiftUI. It handles focus and break cycles, restores an unfinished session after relaunch, and records completed sessions in local productivity charts.
 
 I chose a glass vessel as the timer's main visual. It fills as time passes and changes shape between focus, short break, and long break. When the session ends, the same vessel shows how much focus time was recorded.
 
@@ -43,6 +43,8 @@ The default is four 25-minute focus blocks, with 5-minute short breaks and a fin
 ## Run locally
 
 The deployment target is iOS 26.2. These screenshots were built with Xcode 27.2 (27B52). There are no external package dependencies.
+
+The repository used to be called VibePomodoro. I haven't renamed the Xcode project yet, so the project, scheme, source folder, and bundle ID below still use the old name.
 
 1. Open `VibePomodoro.xcodeproj` in Xcode.
 2. Select the `VibePomodoro` scheme and an iPhone simulator running iOS 26.2 or later.

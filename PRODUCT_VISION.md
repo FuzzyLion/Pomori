@@ -1,6 +1,6 @@
 # Product Vision
 
-I'm building VibePomodoro as an iOS Pomodoro timer with a glass vessel at its center. The app already handles focus and break cycles, restores unfinished sessions, and keeps completed history locally.
+I'm building Pomori as an iOS Pomodoro timer with a glass vessel at its center. The app already handles focus and break cycles, restores unfinished sessions, and keeps completed history locally.
 
 I want to start a timer and leave it beside me while I work. That is why the countdown stays prominent, frequent actions fit on one screen, and the vessel changes shape when the phase changes. A finished session leaves its focus total in the same vessel.
 
