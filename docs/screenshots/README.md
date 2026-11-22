@@ -1,8 +1,6 @@
 # Screenshot gallery
 
-These 21 screenshots were captured from the built app on 18 November 2026, using iPhone 18 Pro / iOS 27.2. The PNGs are full-resolution simulator captures with no retouching. Markdown scales them for display.
-
-The session and history data is generated for these previews. The [README](../../README.md) uses a smaller selection; [PRODUCT_VISION.md](../../PRODUCT_VISION.md) explains the design and behavior.
+All 21 screenshots are untouched simulator captures from an iPhone 18 Pro on iOS 27.2, taken on 18 November 2026. The sessions and history in them are generated test data. The [README](../../README.md) and the [design notes](../design-notes.md) each use a few of them.
 
 ## Capture environment
 
@@ -20,11 +18,11 @@ The session and history data is generated for these previews. The [README](../..
 | Storage | Isolated `Qi.VibePomodoro.DocsPreview` UserDefaults suite |
 | Notifications | UI-testing mode suppresses permission prompts; Settings uses the `allowed` permission fixture |
 
-The source revision identifies the app code in the captures. Rolling-window labels use the capture date, so running the same fixtures later changes the dates shown.
+Rolling-window labels use the capture date, so the same fixtures show different dates on another day.
 
 ## Focus and breaks
 
-Each phase is paused halfway through its current step, so the status reads Focus · Paused and so on. That keeps the liquid and countdown still for comparison. The outline and color change between phases; the baseline and numeral treatment stay the same.
+Each phase is paused halfway through its step, so the liquid and the countdown hold still for comparison.
 
 | Phase | Light | Dark |
 | --- | :---: | :---: |
@@ -32,27 +30,25 @@ Each phase is paused halfway through its current step, so the status reads Focus
 | Short Break · 02:30 left after round 1 | <img src="short-break-light.png" alt="Paused pale leaning short-break vessel, light mode" width="230"> | <img src="short-break-dark.png" alt="Paused pale leaning short-break vessel, dark mode" width="230"> |
 | Long Break · 07:30 left after round 4 | <img src="long-break-light.png" alt="Paused broad jade long-break vessel, light mode" width="230"> | <img src="long-break-dark.png" alt="Paused broad jade long-break vessel, dark mode" width="230"> |
 
-The Focus fixture has one complete focus block, one complete short break, and 12 minutes 30 seconds recorded in the second focus block. Short Break has the first focus block complete. Long Break has all four focus blocks and three short breaks complete.
-
 ### Finishing and immersion
 
 | Finished early · Light | Finished early · Dark | Immersive · Light |
 | :---: | :---: | :---: |
 | <img src="focus-finished-light.png" alt="Light early-completion summary inside the amber vessel" width="230"> | <img src="focus-finished-dark.png" alt="Dark early-completion summary inside the amber vessel" width="230"> | <img src="focus-immersive-light.png" alt="Light Focus vessel with controls, status bar, and tab bar hidden" width="230"> |
 
-The completion images come from choosing Finish early in that second-round Focus fixture. It records 37 minutes 30 seconds of focus, 5 minutes of breaks, and one completed focus block. The compact display reads 37m; VoiceOver keeps the precise duration. The other three focus blocks were not completed.
+The completion images come from tapping Finish early in the Focus fixture above. That session has 37 minutes 30 seconds of focus, 5 minutes of breaks and one completed block, so the vessel reads 37m. VoiceOver reads the exact duration.
 
-The immersive image uses the same paused Focus fixture. Tap the background to hide the controls, status bar, and tab bar without moving the vessel. Tap again to restore them.
+The immersive image is the same fixture after tapping the background, which hides the controls, status bar and tab bar.
 
 ## Productivity
 
-The populated previews use the existing `long-extreme` UI-testing fixture, which generates 30 recent daily sessions and 11 older monthly sessions. It exercises all three ranges and large totals. Some durations exceed the current picker choices because this is stress-test data.
+The populated previews use the `long-extreme` UI-testing fixture, which generates 30 recent daily sessions and 11 older monthly ones. It's stress-test data, so some durations go past what the picker allows.
 
 | Populated · Light | Populated · Dark | Rhythm and sessions · Light |
 | :---: | :---: | :---: |
 | <img src="productivity-light.png" alt="Light all-time summary and Week chart with generated history" width="230"> | <img src="productivity-dark.png" alt="Dark all-time summary and Week chart with generated history" width="230"> | <img src="productivity-detail-light.png" alt="Light Productivity page scrolled to the Week chart and recent-session rows" width="230"> |
 
-The overview images start at the top, where the whole Rhythm card fits above the tab bar. Its upper right names the window and dates. The detail image is scrolled to Rhythm and Sessions, leaving part of the all-time card above the screen. The native tab bar floats above the content.
+The overview images start at the top of the page. The detail image is scrolled down to Rhythm and Sessions.
 
 ### Ranges and selection
 
@@ -60,9 +56,7 @@ The overview images start at the top, where the whole Rhythm card fits above the
 | :---: | :---: | :---: |
 | <img src="productivity-month-light.png" alt="Thirty daily stacked bars in the rolling Month window" width="230"> | <img src="productivity-year-light.png" alt="Twelve monthly stacked bars in the rolling Year window" width="230"> | <img src="productivity-selected-light.png" alt="Wednesday 18 November selected, with one matching session and other bars dimmed" width="230"> |
 
-These captures keep the same scroll position. Month shows 30 daily bars without background glass columns; Year groups by calendar month.
-
-The selected-day image shows 18 November in Week. Rhythm reads 1h 30m Focus, 30m Breaks, and 1 Block, and Sessions shows the one session that started that day. Changing range clears the selection. The all-time summary keeps its totals.
+These three keep the detail view's scroll position. The selected day is 18 November in Week, with its one session listed below the chart.
 
 ### Empty history
 
@@ -70,7 +64,7 @@ The selected-day image shows 18 November in Week. Rhythm reads 1h 30m Focus, 30m
 | :---: | :---: |
 | <img src="productivity-empty-light.png" alt="Light empty-history page with zero totals and no generated bars" width="230"> | <img src="productivity-empty-dark.png" alt="Dark empty-history page with zero totals and no Sessions card" width="230"> |
 
-These launches reset the preview suite and load no history fixture. Totals and Rhythm values are zero. Daily Focus Avg shows a dash, since no day has focus to average. The Week chart keeps its empty tracks, and the Sessions card is omitted. The note explains that a session appears here once it ends.
+These launches reset the preview suite and load no history, so every total is zero and Daily Focus Avg shows a dash.
 
 ## Settings
 
@@ -79,11 +73,11 @@ These launches reset the preview suite and load no history fixture. Totals and R
 | Default rhythm and preferences | <img src="settings-light.png" alt="Default Settings at the top, light appearance" width="230"> | <img src="settings-dark.png" alt="Default Settings at the top, dark appearance" width="230"> |
 | Focus wheel expanded | <img src="settings-picker-light.png" alt="Focus duration wheel expanded beneath its row, light appearance" width="230"> | <img src="settings-picker-dark.png" alt="Focus duration wheel expanded beneath its row, dark appearance" width="230"> |
 
-Settings shows the default 25 / 5 / 15 minute rhythm and four rounds. The expanded wheel stays at 25 minutes. Alerts are on, notification permission is simulated as allowed, and there is no archived history. Display and Other continue below the screenshot.
+Settings shows the default rhythm, 25 / 5 / 15 minutes and four rounds, with alerts on and notification permission simulated as allowed. Display and Other are further down, out of frame.
 
 ## Reproduce the captures
 
-Run these commands from the repository root. Find a simulator with `xcrun simctl list devices available` and set its identifier below. This is the identifier used for the captures; another machine will need its own.
+Run these from the repository root. `DEVICE_ID` is the simulator I used. On another machine, pick one from `xcrun simctl list devices available`.
 
 ```bash
 DEVICE_ID=19E643F3-B20D-4E3F-8877-4FE065C4EAE1
@@ -91,7 +85,7 @@ BUNDLE_ID=Qi.VibePomodoro
 PREVIEW_SUITE=Qi.VibePomodoro.DocsPreview
 ```
 
-Build, boot, and install the app. If the device is already booted, skip the `boot` command. The README explains the Metal Toolchain requirement.
+Build, boot and install the app. Skip `boot` if the simulator is already running.
 
 ```bash
 xcodebuild \
@@ -112,7 +106,7 @@ xcrun simctl status_bar "$DEVICE_ID" override \
   --batteryState charged --batteryLevel 100
 ```
 
-Set the isolated defaults suite before using `--reset-vibe-store`, since that flag clears the selected suite. The helper below also terminates the previous launch and sets the appearance, language, and notification fixture:
+Set the isolated defaults suite before `--reset-vibe-store`, because that flag clears whichever suite is selected. The helper below does that, closes the previous launch, and sets the appearance, language and notification fixture:
 
 ```bash
 preview() {
@@ -128,14 +122,14 @@ preview() {
 }
 ```
 
-Launch the paused Focus fixture, then capture it. The helper waits ten seconds because shorter waits on this setup sometimes captured a blank launch frame or an appearance transition. Check the saved image before replacing a screenshot, and wait longer if the page hasn't settled.
+Launch the paused Focus fixture and capture it. The helper waits ten seconds because shorter waits sometimes caught a blank launch frame or a half-finished appearance change. Check each image before replacing a screenshot, and wait longer if the page hasn't settled.
 
 ```bash
 SIMCTL_CHILD_VIBE_FOCUS_FIXTURE=focus-2-0.5 preview light
 xcrun simctl io "$DEVICE_ID" screenshot docs/screenshots/focus-light.png
 ```
 
-Repeat with `dark` and the matching output filename. The existing Focus fixture syntax is `<phase>-<round>-<progress>`; an optional trailing `-running` starts the timer rather than pausing it.
+Repeat with `dark` and the matching filename. Focus fixtures are written `<phase>-<round>-<progress>`, and a trailing `-running` leaves the timer running.
 
 | Screenshot stem | Fixture or launch recipe |
 | --- | --- |
@@ -153,7 +147,7 @@ Repeat with `dark` and the matching output filename. The existing Focus fixture 
 | `settings` | No session or history fixture, with `--open-settings`. |
 | `settings-picker` | `--open-settings --expand-focus-settings-picker`, which opens the Focus wheel at 25 minutes without a tap. |
 
-With `simctl`, app environment variables need the `SIMCTL_CHILD_` prefix. These commands capture populated Productivity, empty Productivity, and Settings:
+With `simctl`, app environment variables need the `SIMCTL_CHILD_` prefix. For example, populated Productivity, empty Productivity and Settings:
 
 ```bash
 SIMCTL_CHILD_VIBE_PRODUCTIVITY_FIXTURE=long-extreme \
@@ -167,12 +161,10 @@ preview light --open-settings
 xcrun simctl io "$DEVICE_ID" screenshot docs/screenshots/settings-light.png
 ```
 
-Each fixture assignment applies to that launch only, so the next clean preview doesn't inherit its history or session. To inspect other permission states, change `allowed` in the helper to `denied` or `notDetermined`. Those states aren't shown in this set.
+A fixture only applies to its own launch, so the next preview starts clean. For other permission states, change `allowed` in the helper to `denied` or `notDetermined`.
 
-Check the original images, dimensions, and Markdown paths after capture. Remove the temporary status-bar override when finished:
+Afterwards, check the images, their size and the Markdown paths, then clear the status-bar override:
 
 ```bash
 xcrun simctl status_bar "$DEVICE_ID" clear
 ```
-
-Physical haptics, lock-screen notification delivery, heat, and energy use still need device tests.
