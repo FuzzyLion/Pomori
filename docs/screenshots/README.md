@@ -1,6 +1,6 @@
 # Screenshot gallery
 
-All 21 screenshots are untouched simulator captures from an iPhone 18 Pro on iOS 27.2, taken on 18 November 2026. The sessions and history in them are generated test data. The [README](../../README.md) and [PRODUCT_VISION.md](../../PRODUCT_VISION.md) each use a few of them.
+All 21 screenshots are untouched simulator captures from an iPhone 18 Pro on iOS 27.2, taken on 18 November 2026. The sessions and history in them are generated test data. The [README](../../README.md) and the [design notes](../design-notes.md) each use a few of them.
 
 ## Capture environment
 

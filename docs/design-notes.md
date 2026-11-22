@@ -1,8 +1,8 @@
-# Product Vision
+# Design notes
 
 I want a timer I can start and leave beside me while I work. So the countdown is big, and the actions I need often all fit on one screen. The vessel also changes shape with each phase, so one glance tells me where I am.
 
-This document explains the decisions behind the app and what isn't done yet. Setup is in the [README](README.md), and the [screenshot gallery](docs/screenshots/README.md) has more states.
+These notes explain the decisions behind the app and what isn't done yet. Setup is in the [README](../README.md), and the [screenshot gallery](screenshots/README.md) has more states.
 
 The app has three pages, Focus, Productivity and Settings, and everything stays on the device. On iPhone it only runs in portrait. In landscape the top of the vessel got cut off and the controls slid under the tab bar. A layout for a phone on a desk stand needs its own design, so I locked the orientation for now.
 
@@ -22,7 +22,7 @@ In dark mode the amber read as tea, so the Focus liquid now keeps a little warme
 
 | Focus | Short break | Long break |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/focus-dark.png" alt="Paused amber Focus vessel, dark mode" width="230"> | <img src="docs/screenshots/short-break-dark.png" alt="Paused pale leaning short-break vessel, dark mode" width="230"> | <img src="docs/screenshots/long-break-dark.png" alt="Paused broad jade long-break vessel, dark mode" width="230"> |
+| <img src="screenshots/focus-dark.png" alt="Paused amber Focus vessel, dark mode" width="230"> | <img src="screenshots/short-break-dark.png" alt="Paused pale leaning short-break vessel, dark mode" width="230"> | <img src="screenshots/long-break-dark.png" alt="Paused broad jade long-break vessel, dark mode" width="230"> |
 
 The countdown is set in Didot Bold. It sits inside the glass as a thin solid, with a lit bevel and a soft shadow on the back wall. Below the surface the liquid tints and bends it. At the waterline that bend is only a small kink, never a second digit.
 
@@ -67,7 +67,7 @@ This page uses SF Pro with monospaced digits. Didot stays inside the vessel, bec
 
 | Month | Selected day | Empty history |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/productivity-month-light.png" alt="Thirty daily stacked bars in the rolling Month window" width="230"> | <img src="docs/screenshots/productivity-selected-light.png" alt="Wednesday 18 November selected, with one matching session and other bars dimmed" width="230"> | <img src="docs/screenshots/productivity-empty-light.png" alt="Light empty-history page with zero totals and no generated bars" width="230"> |
+| <img src="screenshots/productivity-month-light.png" alt="Thirty daily stacked bars in the rolling Month window" width="230"> | <img src="screenshots/productivity-selected-light.png" alt="Wednesday 18 November selected, with one matching session and other bars dimmed" width="230"> | <img src="screenshots/productivity-empty-light.png" alt="Light empty-history page with zero totals and no generated bars" width="230"> |
 
 ## Reminders
 

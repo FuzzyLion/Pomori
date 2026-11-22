@@ -2,7 +2,7 @@
 
 Pomori is an iOS Pomodoro timer I'm building in SwiftUI. The timer is a glass vessel that fills up as time passes, and the full focus and break cycle already works.
 
-AI agents wrote the code. I do the UI design and the review, and many of the ideas are mine. I read up on SwiftUI along the way. [PRODUCT_VISION.md](PRODUCT_VISION.md) explains the design decisions.
+AI agents wrote the code. I do the UI design and the review, and many of the ideas are mine. I read up on SwiftUI along the way. The [design notes](docs/design-notes.md) explain the decisions behind it.
 
 ## Screenshots
 
