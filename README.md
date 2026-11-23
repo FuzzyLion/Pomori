@@ -87,3 +87,7 @@ VibePomodoro/
 Data lives in UserDefaults for now. Settings, the active session, the history and the statistics cache are written separately, so changing a setting never rewrites the history.
 
 The liquid redraws at most 12 times a second, and only while the timer runs on screen. I haven't measured what that costs in heat and battery on a real iPhone yet. Reduce Motion turns the movement off, and Low Power Mode drops the caustic light. The app also adapts to larger text, Increase Contrast and VoiceOver.
+
+## License
+
+The code is under the [MIT License](LICENSE). The name Pomori and the app icon in `VibePomodoro/AppIcon.icon/` aren't, so please don't publish a copy of the app under that name or with that icon.
